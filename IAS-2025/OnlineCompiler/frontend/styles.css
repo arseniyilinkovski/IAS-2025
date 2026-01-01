@@ -1,0 +1,663 @@
+
+:root {
+    --primary: #4361ee;
+    --primary-dark: #3a56d4;
+    --secondary: #7209b7;
+    --success: #2ecc71;
+    --success-dark: #27ae60;
+    --dark: #1a1a2e;
+    --darker: #16213e;
+    --light: #f8f9fa;
+    --gray: #6c757d;
+    --info: #4cc9f0;
+    --warning: #f72585;
+    --border-radius: 8px;
+    --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+    color: var(--light);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    padding: 30px 0;
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.logo i {
+    font-size: 2.5rem;
+    color: var(--info);
+}
+/* Добавляем это после стилей для .logo (примерно на 45-й строке) */
+
+.logo img {
+    height: 50px; /* Размер логотипа */
+    width: auto;
+    filter: drop-shadow(0 0 10px rgba(76, 201, 240, 0.5)); /* Легкое свечение */
+    transition: var(--transition);
+    animation: logoFloat 3s ease-in-out infinite; /* Анимация парения */
+}
+
+/* Убираем иконку кода, если используем логотип */
+.logo i {
+    display: none; /* Скрываем иконку, когда есть лого */
+}
+
+/* Когда нет логотипа (резервный вариант) */
+.logo:has(img) i {
+    display: none;
+}
+
+.logo:not(:has(img)) i {
+    display: block;
+    font-size: 2.5rem;
+    color: var(--info);
+}
+
+/* Анимация парения для логотипа */
+@keyframes logoFloat {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+        filter: drop-shadow(0 0 10px rgba(76, 201, 240, 0.5));
+    }
+    50% {
+        transform: translateY(-8px) rotate(2deg);
+        filter: drop-shadow(0 0 15px rgba(76, 201, 240, 0.8));
+    }
+}
+
+/* Анимация пульсации для логотипа при наведении */
+@keyframes logoPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+
+/* Медиа-запросы для адаптивности логотипа */
+@media (max-width: 768px) {
+    .logo img {
+        height: 40px; /* Уменьшаем логотип на мобильных */
+    }
+    
+    h1 {
+        font-size: 2.2rem;
+    }
+    
+    .logo {
+        gap: 10px; /* Уменьшаем отступы */
+    }
+}
+
+/* Дополнительные стили для анимации загрузки логотипа */
+@keyframes logoAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8) rotate(-10deg);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+}
+/* Стили для логотипа */
+.logo img {
+    height: 50px; /* Размер логотипа */
+    width: auto;
+}
+
+/* Анимация парения для логотипа */
+@keyframes logoFloat {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+        filter: drop-shadow(0 0 10px rgba(76, 201, 240, 0.5));
+    }
+    50% {
+        transform: translateY(-8px) rotate(2deg);
+        filter: drop-shadow(0 0 20px rgba(76, 201, 240, 0.9));
+    }
+}
+
+/* Анимация пульсации для логотипа */
+@keyframes logoPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Постоянная анимация логотипа */
+.logo img {
+    animation: logoFloat 3s ease-in-out infinite, logoPulse 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 15px rgba(76, 201, 240, 0.7));
+    transition: var(--transition);
+}
+
+/* Усиление анимации при наведении */
+.logo:hover img {
+    animation-duration: 2.5s, 3s; /* Немного меняем скорость анимаций */
+    filter: drop-shadow(0 0 25px rgba(76, 201, 240, 1));
+    transform: scale(1.08);
+}
+
+
+h1 {
+    font-size: 2.8rem;
+    background: linear-gradient(90deg, var(--primary), var(--info));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 700;
+}
+
+.subtitle {
+    color: var(--gray);
+    font-size: 1.2rem;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.compiler-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 1100px) {
+    .compiler-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.editor-section, .output-section {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: var(--box-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-title i {
+    color: var(--primary);
+}
+
+.language-selector {
+    background-color: var(--darker);
+    color: var(--light);
+    border: 1px solid var(--primary);
+    border-radius: var(--border-radius);
+    padding: 8px 15px;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 500;
+}
+
+.editor-wrapper {
+    flex-grow: 1;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+/* Стили для редактора с нумерацией строк */
+.editor-container {
+    display: flex;
+    width: 100%;
+    height: 400px;
+    background-color: #0d1117;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+}
+
+.line-numbers {
+    width: 50px;
+    padding: 20px 10px 20px 0;
+    background-color: #0d1117;
+    color: #6e7681;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: right;
+    user-select: none;
+    overflow: hidden;
+    border-right: 1px solid #30363d;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.line-number {
+    display: block;
+    min-height: 21px;
+    line-height: 21px;
+}
+
+#codeEditor {
+    flex: 1;
+    height: 100%;
+    background-color: #0d1117;
+    color: #c9d1d9;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 20px;
+    border: none;
+    resize: none;
+    outline: none;
+    overflow-y: auto;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+    box-sizing: border-box;
+}
+
+/* Синхронизация высоты строк */
+#codeEditor, .line-numbers {
+    line-height: 21px;
+}
+
+.editor-wrapper {
+    flex-grow: 1;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.output-wrapper {
+    flex-grow: 1;
+    background-color: #0d1117;
+    border-radius: var(--border-radius);
+    padding: 20px;
+    font-family: 'Roboto Mono', monospace;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-height: 200px;
+    max-height: 450px;
+}
+
+#output {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.output-line {
+    margin-bottom: 5px;
+    line-height: 1.5;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 14px;
+}
+
+.output-error {
+    color: var(--warning);
+}
+
+.output-success {
+    color: var(--success);
+}
+
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 14px 28px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: var(--border-radius);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-3px);
+}
+
+.btn-success {
+    background-color: var(--success);
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: var(--success-dark);
+    transform: translateY(-3px);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--light);
+    border: 2px solid var(--primary);
+}
+
+.btn-secondary:hover {
+    background-color: rgba(67, 97, 238, 0.1);
+    transform: translateY(-3px);
+}
+
+.btn-warning {
+    background-color: var(--warning);
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #e11575;
+    transform: translateY(-3px);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+.examples-grid {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: var(--box-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 60px; /* Увеличил с 40px до 60px */
+    position: relative; /* Для лучшего контроля z-index */
+    z-index: 1; /* Чтобы был выше анимаций */
+}
+
+
+
+.examples-header {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.examples-header i {
+    color: var(--success);
+}
+
+.examples-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.example-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid transparent;
+}
+
+.example-card:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary);
+    transform: translateY(-5px);
+}
+
+.example-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--success);
+}
+
+.example-desc {
+    color: var(--gray);
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+}
+
+.example-code {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.85rem;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+footer {
+    text-align: center;
+    padding: 30px 0;
+    margin-top: 50px;
+    color: var(--gray);
+    font-size: 0.9rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--success);
+    margin-right: 8px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.loader {
+    display: none;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid var(--primary);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .compiler-container {
+        gap: 20px;
+    }
+    
+    .editor-section, .output-section {
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 2.2rem;
+    }
+    
+    .btn {
+        padding: 12px 20px;
+        font-size: 1rem;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .buttons-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .language-selector {
+        align-self: stretch;
+    }
+}
+/* Специальные эффекты для логотипа при взаимодействии с редактором */
+#codeEditor:focus ~ .compiler-container .logo img {
+    animation: logoPulse 0.5s ease-in-out;
+}
+
+/* Эффект при успешной трансляции */
+.success-translation .logo img {
+    filter: drop-shadow(0 0 15px rgba(46, 204, 113, 0.7));
+}
+
+/* Эффект при ошибке */
+.error-translation .logo img {
+    filter: drop-shadow(0 0 15px rgba(247, 37, 133, 0.7));
+}
+
+/* Класс для затемнения логотипа при загрузке */
+.loading .logo img {
+    opacity: 0.7;
+    animation-duration: 1.5s;
+}
+/* Модальные окна */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: modalAppear 0.3s ease-out;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.modal-success .modal-icon {
+    color: var(--success);
+}
+
+.modal-error .modal-icon {
+    color: var(--warning);
+}
+
+.modal-title {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.modal-message {
+    color: var(--gray);
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+}
+
+.modal-btn {
+    padding: 12px 30px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.modal-btn:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+

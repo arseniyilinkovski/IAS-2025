@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онлайн компилятор IAS-2025</title>
+    <link rel="icon" type="image/png" href="Copilot_20251215_101846.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="logo.png" alt="IAS-2025 Logo" class="logo-image">
+                <h1>Онлайн транслятор IAS-2025</h1>
+            </div>
+            <p class="subtitle">Напишите код на языке IAS-2025, транслируйте его в Assembler. Поддерживаются примеры кода для быстрого старта.</p>
+        </header>
+        
+        <main>
+            <div class="compiler-container">
+                <section class="editor-section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-edit"></i> Исходный код (IAS-2025)
+                        </h2>
+                        <select class="language-selector" id="languageSelector">
+                            <option value="myLang">Язык IAS-2025</option>
+                            <option value="asm">Assembler</option>
+                        </select>
+                    </div>
+                    <div class="editor-wrapper">
+                        <div class="editor-container">
+                            <div class="line-numbers" id="lineNumbers">1</div>
+                            <textarea id="codeEditor" placeholder="Введите ваш код на языке IAS-2025 здесь...">#Пример программы на языке IAS-2025
+main{
+    int var a = 10; #инициализация переменной int
+    int var b = 10; #инициализация переменной int
+    int var res = a + b;#результат сложения в переменную
+    output res;
+}</textarea>
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="output-section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-terminal"></i> Результат
+                        </h2>
+                        <div class="status">
+                            <span class="status-indicator"></span>
+                            <span id="statusText">Готов к трансляции</span>
+                        </div>
+                    </div>
+                    <div class="output-wrapper">
+                        <div id="output">
+                            <div class="output-line">// Результат появится здесь после трансляции</div>
+                            <div class="output-line"></div>
+                            <div class="output-line">Выберите пример кода или напишите свой,</div>
+                            <div class="output-line">затем нажмите "Транслировать в ASM".</div>
+                        </div>
+                    </div>
+                    <div class="loader" id="loader"></div>
+                </section>
+            </div>
+            
+            <div class="buttons-container">
+                <button class="btn btn-primary" id="compileBtn">
+                    <i class="fas fa-cogs"></i> Транслировать в ASM
+                </button>
+                <button class="btn btn-success" id="copyAsmBtn">
+                    <i class="fas fa-copy"></i> Скопировать ASM-код
+                </button>
+                <button class="btn btn-secondary" id="clearBtn">
+                    <i class="fas fa-broom"></i> Очистить редактор
+                </button>
+                <button class="btn btn-secondary" id="downloadBtn">
+                    <i class="fas fa-download"></i> Скачать ASM код
+                </button>
+            </div>
+            
+            <div class="examples-grid">
+    <div class="example-card" data-example="hello">
+        <div class="example-title">Hello world!</div>
+        <div class="example-desc">Простая программа, выводящая приветствие</div>
+        <div class="example-code">
+            main{
+                output "Hello world";
+            }
+        </div>
+    </div>
+    <div class="example-card" data-example="functions">
+        <div class="example-title">Пользовательские функции</div>
+        <div class="example-desc">Демонстрация объявления и вызова функций</div>
+        <div class="example-code">
+            bool function IsEven(int param arg){
+                bool var res;
+                int var buf = arg % 2;
+                if (buf & 0)
+                then{
+                    res = true;
+                }
+                else{
+                    res = false;
+                }
+                return res;
+            }
+            main{
+                int var test = 10;
+                bool var evenFlag = IsEven(test);
+                output evenFlag;
+            }
+        </div>
+    </div>
+    <div class="example-card" data-example="control">
+        <div class="example-title">Контрольный пример</div>
+        <div class="example-desc">Комплексный пример с функциями и операциями</div>
+        <div class="example-code">
+            int function get_sum(int param argOne, int param argTwo){
+                int var res = argOne + argTwo;
+                return res;
+            }
+            bool function IsStringsEquals(str param StringOne, str param StringTwo){
+                bool var res;
+                int var lenOne = lenght(StringOne);
+                int var lenTwo = lenght(StringTwo);
+                if (lenOne & lenTwo)
+                then{
+                    res = true;
+                }
+                else{
+                    res = false;
+                }
+                return res;
+            }
+            main{
+                output "n";
+                str var date = getLocalTimeAndDate();
+                output date;
+                int var a = b1010; #10
+                output "Переменная a";
+                output a;
+                int var b = h32; #50
+                output "Переменная b";
+                output b;
+            }
+        </div>
+    </div>
+    <div class="example-card" data-example="error">
+        <div class="example-title">Коплексное выражение</div>
+        <div class="example-desc">Пример выражения, демонстрирующий все операторы языка</div>
+        <div class="example-code">
+            main {
+int var a = 11;
+a = (8 / 2) * (a - 2) + (a % 2);
+output a;
+}
+        </div>
+    </div>
+</div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Онлайн транслятор для языка IAS-2025 &copy; 2025</p>
+            <p>Трансляция в язык Assembler | Все права защищены</p>
+        </footer>
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+</html>

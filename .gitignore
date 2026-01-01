@@ -1,0 +1,124 @@
+## -----------------------------
+##  Visual Studio (2022–2026)
+## -----------------------------
+
+# User-specific files
+*.zip
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+ARM/
+ARM64/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# Visual Studio cache
+.vs/
+.vscode/
+.vsconfig
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_build/
+build/
+out/
+
+# vcpkg
+vcpkg_installed/
+vcpkg-configuration.json
+vcpkg-lock.json
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+*.nuget.props
+*.nuget.targets
+
+# MSBuild
+*.tlog
+*.lastbuildstate
+
+# Compiled binaries
+*.exe
+*.dll
+*.lib
+*.pdb
+*.ilk
+*.obj
+*.iobj
+*.ipdb
+
+# Static analysis
+*.sarif
+
+# Precompiled headers
+*.pch
+
+# Generated files
+*.idb
+*.opendb
+*.cachefile
+*.log
+*.tlog
+
+# IntelliSense
+*.sdf
+*.cache
+*.VC.db
+*.VC.VC.opendb
+
+# Crash dumps
+*.dmp
+
+# Others
+*.tmp
+*.temp
+*.bak
+
+# Ignore local environment configs
+*.local
+*.env
+*.env.*
+
+# Qt (если используешь)
+*.pro.user
+*.qmake.stash
+*.moc
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+
+# Conan (если используешь)
+conanbuildinfo.*
+conaninfo.txt
+conan.lock
+
+# CLion / JetBrains
+.idea/
+
+# Windows junk
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/

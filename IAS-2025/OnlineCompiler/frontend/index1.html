@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Подсветка слов</title>
+    <style>
+        .highlight {
+            color: blue;
+            font-weight: bold;
+        }
+        #textContainer {
+            border: 1px solid #ccc;
+            padding: 8px;
+            min-height: 100px;
+            width: 300px;
+            font-family: Arial, sans-serif;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="textContainer" contenteditable="true">Стандартный текст</div>
+
+    <script>
+        const textContainer = document.getElementById('textContainer');
+        
+        // Словарь слов для подсветки
+        const dictionary = ['integer', 'text', 'стандартный', 'слово', 'пример'];
+        
+        // Функция для проверки и подсветки слов
+        function highlightWords() {
+            // Сохраняем позицию курсора
+            const selection = window.getSelection();
+            const cursorPos = selection.anchorOffset;
+            const currentNode = selection.anchorNode;
+            
+            // Получаем весь текст из контейнера
+            let text = textContainer.textContent || textContainer.innerText;
+            
+            // Очищаем контейнер
+            textContainer.innerHTML = '';
+            
+            // Разбиваем текст на части (слова, пробелы и переносы строк)
+            const parts = text.split(/(\s+|\n+)/);
+            
+            // Собираем обратно с подсветкой
+            parts.forEach(part => {
+                if (part.trim() === '') {
+                    // Добавляем пробелы и переносы строк как есть
+                    textContainer.appendChild(document.createTextNode(part));
+                } else {
+                    // Проверяем, является ли слово из словаря (без учета регистра)
+                    const isInDictionary = dictionary.some(dictWord => 
+                        part.toLowerCase() === dictWord.toLowerCase()
+                    );
+                    
+                    if (isInDictionary) {
+                        // Если слово в словаре - добавляем с подсветкой
+                        const span = document.createElement('span');
+                        span.className = 'highlight';
+                        span.textContent = part;
+                        textContainer.appendChild(span);
+                    } else {
+                        // Иначе добавляем как обычный текст
+                        textContainer.appendChild(document.createTextNode(part));
+                    }
+                }
+            });
+            
+            // Восстанавливаем курсор
+            restoreCursor();
+        }
+        
+        // Функция для восстановления позиции курсора
+        function restoreCursor() {
+            const range = document.createRange();
+            const selection = window.getSelection();
+            
+            // Простой способ - ставим курсор в конец
+            range.selectNodeContents(textContainer);
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            
+            // Фокус на элементе
+            textContainer.focus();
+        }
+        
+        // Обработчик события ввода
+        textContainer.addEventListener('input', function(e) {
+            // Используем setTimeout чтобы дать браузеру обновить контент
+            setTimeout(() => {
+                highlightWords();
+            }, 10);
+        });
+        
+        // Обработчик нажатия клавиш
+        textContainer.addEventListener('keydown', function(e) {
+            // Если нажали Enter, предотвращаем стандартное поведение
+            if (e.key === 'Enter') {
+                // Добавляем перенос строки вручную
+                document.execCommand('insertLineBreak');
+                e.preventDefault();
+                
+                // Подсвечиваем через небольшой таймаут
+                setTimeout(() => {
+                    highlightWords();
+                }, 10);
+            }
+        });
+        
+        // Инициализация - подсветка начального текста
+        highlightWords();
+    </script>
+</body>
+</html>

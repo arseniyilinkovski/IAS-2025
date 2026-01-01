@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IAS-2025 | Красный Компилятор</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <!-- Заставка при загрузке -->
+    <div class="loader">
+        <div class="loader-content">
+            <div class="loader-logo">
+                <i class="fas fa-fire"></i>
+                <span>IAS-2025</span>
+            </div>
+            <div class="loader-bar">
+                <div class="loader-progress"></div>
+            </div>
+            <p class="loader-text">Инициализация компилятора...</p>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="main-content">
+        <!-- Верхняя панель -->
+        <div class="top-bar">
+            <div class="container">
+                <div class="top-bar-content">
+                    <div class="brand">
+                        <div class="logo">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="brand-text">
+                            <h1><span class="red-glow">IAS</span>-2025</h1>
+                            <p class="tagline">Красный Компилятор</p>
+                        </div>
+                    </div>
+                    
+                    <div class="global-controls">
+                        <div class="server-status" id="serverStatus">
+                            <i class="fas fa-server"></i>
+                            <span>Подключение...</span>
+                        </div>
+                        <button class="control-btn danger" id="quickCompile" title="Быстрая трансляция (Ctrl+Enter)">
+                            <i class="fas fa-bolt"></i>
+                            Транслировать
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Основная рабочая область -->
+        <div class="workspace">
+            <div class="container">
+                <div class="workspace-grid">
+                    <!-- Левая колонка - Ввод кода -->
+                    <div class="code-column">
+                        <div class="panel-header">
+                            <div class="panel-title">
+                                <i class="fas fa-code"></i>
+                                <h2>Исходный код IAS-2025</h2>
+                            </div>
+                            <div class="panel-actions">
+                                <div class="file-info">
+                                    <i class="fas fa-file-code"></i>
+                                    <span id="fileName">new_program.ias</span>
+                                </div>
+                                <button class="action-btn" id="newFile" title="Новый файл">
+                                    <i class="fas fa-file"></i>
+                                </button>
+                                <button class="action-btn" id="saveFile" title="Сохранить код">
+                                    <i class="fas fa-save"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="code-container">
+                            <div class="code-toolbar">
+                                <div class="template-selector">
+                                    <select id="templateSelect">
+                                        <option value="">Выберите шаблон...</option>
+                                        <option value="hello">Привет, мир!</option>
+                                        <option value="calc">Калькулятор</option>
+                                        <option value="loop">Циклы</option>
+                                        <option value="func">Функции</option>
+                                        <option value="array">Массивы</option>
+                                        <option value="full">Полный пример</option>
+                                    </select>
+                                    <button class="small-btn" id="loadTemplate">
+                                        <i class="fas fa-download"></i> Загрузить
+                                    </button>
+                                </div>
+                                <div class="editor-stats">
+                                    <span id="charCount">0 символов</span>
+                                    <span id="lineCount">1 строка</span>
+                                </div>
+                            </div>
+                            
+        <div class="line-numbers" id="lineNumbers">1</div>
+        <textarea id="codeEditor" placeholder="Введите ваш код на языке IAS-2025 здесь...">#Пример программы на языке IAS-2025
+main{
+    int var a = 10; #инициализация переменной int
+    int var b = 10; #инициализация переменной int
+    int var res = a + b;#результат сложения в переменную
+    output res;
+}</textarea>
+    </div>
+                            
+                            <div class="editor-footer">
+                                <div class="position-info">
+                                    <i class="fas fa-caret-right"></i>
+                                    <span id="cursorPos">Строка 1, Колонка 1</span>
+                                </div>
+                                <div class="compile-controls">
+                                    <button class="compile-btn" id="compileBtn">
+                                        <i class="fas fa-cogs"></i>
+                                        Транслировать в ASM
+                                    </button>
+                                    <button class="clear-btn" id="clearBtn">
+                                        <i class="fas fa-trash"></i>
+                                        Очистить
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Шаблоны кода -->
+                        <div class="templates-panel">
+                            <h3><i class="fas fa-th-large"></i> Быстрые шаблоны</h3>
+                            <div class="template-cards">
+                                <div class="template-card" data-template="hello">
+                                    <div class="template-icon">
+                                        <i class="fas fa-hand-peace"></i>
+                                    </div>
+                                    <h4>Hello World</h4>
+                                    <p>Базовая программа вывода</p>
+                                </div>
+                                <div class="template-card" data-template="calc">
+                                    <div class="template-icon">
+                                        <i class="fas fa-calculator"></i>
+                                    </div>
+                                    <h4>Калькулятор</h4>
+                                    <p>Арифметические операции</p>
+                                </div>
+                                <div class="template-card" data-template="loop">
+                                    <div class="template-icon">
+                                        <i class="fas fa-redo"></i>
+                                    </div>
+                                    <h4>Циклы</h4>
+                                    <p>For и While циклы</p>
+                                </div>
+                                <div class="template-card" data-template="func">
+                                    <div class="template-icon">
+                                        <i class="fas fa-cogs"></i>
+                                    </div>
+                                    <h4>Функции</h4>
+                                    <p>Определение и вызов функций</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Правая колонка - Результат -->
+                    <div class="result-column">
+                        <div class="panel-header">
+                            <div class="panel-title">
+                                <i class="fas fa-file-code"></i>
+                                <h2>Результат трансляции (ASM)</h2>
+                            </div>
+                            <div class="panel-actions">
+                                <button class="action-btn success" id="copyAsm" title="Копировать ASM код">
+                                    <i class="far fa-copy"></i>
+                                </button>
+                                <button class="action-btn warning" id="executeAsm" title="Выполнить ASM код">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <button class="action-btn danger" id="clearResult" title="Очистить результат">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="result-container">
+                            <div class="result-tabs">
+                                <button class="tab-btn active" data-tab="asm">ASM Код</button>
+                                <button class="tab-btn" data-tab="output">Вывод программы</button>
+                                <button class="tab-btn" data-tab="debug">Отладка</button>
+                            </div>
+                            
+                            <div class="result-content">
+                                <div class="tab-pane active" id="asm-tab">
+                                    <div id="asmOutput"></div>
+                                </div>
+                                <div class="tab-pane" id="output-tab">
+                                    <div class="program-output">
+                                        <div class="output-header">
+                                            <i class="fas fa-terminal"></i>
+                                            <span>Вывод программы</span>
+                                        </div>
+                                        <pre id="programOutput">// Запустите программу, чтобы увидеть вывод здесь</pre>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="debug-tab">
+                                    <div class="debug-info">
+                                        <div class="debug-item">
+                                            <span class="debug-label">Статус:</span>
+                                            <span class="debug-value" id="debugStatus">Ожидание трансляции</span>
+                                        </div>
+                                        <div class="debug-item">
+                                            <span class="debug-label">Время компиляции:</span>
+                                            <span class="debug-value" id="compileTime">0 мс</span>
+                                        </div>
+                                        <div class="debug-item">
+                                            <span class="debug-label">Размер ASM:</span>
+                                            <span class="debug-value" id="asmSize">0 байт</span>
+                                        </div>
+                                        <div class="debug-item">
+                                            <span class="debug-label">Ошибки:</span>
+                                            <span class="debug-value success" id="errorCount">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Информационная панель -->
+                        <div class="info-panel">
+                            <h3><i class="fas fa-info-circle"></i> Справка по синтаксису</h3>
+                            <div class="syntax-help">
+                                <div class="syntax-item">
+                                    <code class="syntax-keyword">программа</code>
+                                    <span>Объявление программы</span>
+                                </div>
+                                <div class="syntax-item">
+                                    <code class="syntax-type">int var</code>
+                                    <span>Объявление переменной</span>
+                                </div>
+                                <div class="syntax-item">
+                                    <code class="syntax-func">вывод()</code>
+                                    <span>Вывод на экран</span>
+                                </div>
+                                <div class="syntax-item">
+                                    <code class="syntax-control">если ... тогда</code>
+                                    <span>Условный оператор</span>
+                                </div>
+                                <div class="syntax-item">
+                                    <code class="syntax-loop">повтор</code>
+                                    <span>Цикл</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Нижняя панель -->
+        <div class="bottom-bar">
+            <div class="container">
+                <div class="bottom-bar-content">
+                    <div class="status-line">
+                        <div class="status-item">
+                            <i class="fas fa-circle status-ready"></i>
+                            <span>IAS-2025 Компилятор</span>
+                        </div>
+                        <div class="status-item">
+                            <i class="fas fa-microchip"></i>
+                            <span>Транслятор: <span id="translatorStatus">Загрузка...</span></span>
+                        </div>
+                        <div class="status-item">
+                            <i class="fas fa-clock"></i>
+                            <span id="currentTime">--:--:--</span>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-btn" id="quickExample" title="Загрузить пример">
+                            <i class="fas fa-file-alt"></i>
+                        </button>
+                        <button class="quick-btn" id="quickSettings" title="Настройки">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                        <button class="quick-btn" id="quickHelp" title="Помощь">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомления -->
+    <div class="notification-container">
+        <div class="notification" id="notification">
+            <div class="notification-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="notification-content">
+                <div class="notification-title" id="notificationTitle">Уведомление</div>
+                <div class="notification-text" id="notificationText">Текст уведомления</div>
+            </div>
+            <button class="notification-close">&times;</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно настроек -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-cog"></i> Настройки компилятора</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4>Настройки сервера</h4>
+                    <div class="setting-item">
+                        <label>URL API сервера:</label>
+                        <input type="text" id="apiUrl" value="http://localhost:8000" placeholder="http://localhost:8000">
+                    </div>
+                    <div class="setting-item">
+                        <label>Таймаут запроса (сек):</label>
+                        <input type="number" id="timeout" value="30" min="5" max="120">
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h4>Настройки редактора</h4>
+                    <div class="setting-item">
+                        <label>Размер шрифта:</label>
+                        <input type="range" id="fontSize" min="10" max="20" value="14">
+                        <span id="fontSizeValue">14px</span>
+                    </div>
+                    <div class="setting-item">
+                        <label>Автосохранение:</label>
+                        <label class="switch">
+                            <input type="checkbox" id="autoSave" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn secondary" id="cancelSettings">Отмена</button>
+                <button class="btn primary" id="saveSettings">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Скрипты -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="ias-syntax.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
