@@ -1,0 +1,34 @@
+﻿<Window x:Class="SimpleIDE.Views.UserManagementWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Управление пользователями" Height="500" Width="800"
+        WindowStartupLocation="CenterOwner"
+        Background="White">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="👥 Все пользователи" FontSize="24" FontWeight="SemiBold" 
+                   Foreground="#333" Margin="0,0,0,20"/>
+
+        <DataGrid x:Name="UsersGrid" Grid.Row="1" AutoGenerateColumns="False" 
+                  CanUserAddRows="False" SelectionMode="Single">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="Имя пользователя" Binding="{Binding Username}" Width="200"/>
+                <DataGridTextColumn Header="Дата регистрации" Binding="{Binding CreatedAt}" Width="150"/>
+                <DataGridTemplateColumn Header="Статус" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsAdmin, UpdateSourceTrigger=PropertyChanged}"
+                                      IsEnabled="True"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

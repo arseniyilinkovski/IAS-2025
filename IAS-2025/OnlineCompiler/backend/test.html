@@ -1,0 +1,567 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тест бэкенда IAS-2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: linear-gradient(135deg, #1e1e2f 0%, #2d2d3f 100%);
+            color: #d4d4d4;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #61dafb;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #8b949e;
+            margin-bottom: 30px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: #252526;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .panel-header {
+            background: #2d2d30;
+            padding: 12px 16px;
+            border-bottom: 1px solid #3e3e42;
+            font-weight: bold;
+            color: #61dafb;
+        }
+
+            .panel-header i {
+                margin-right: 8px;
+            }
+
+        textarea {
+            width: 100%;
+            height: 500px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border: none;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+        }
+
+            textarea:focus {
+                outline: none;
+                background: #252526;
+            }
+
+        pre {
+            background: #1e1e1e;
+            padding: 15px;
+            height: 500px;
+            overflow: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+            button:hover {
+                background: #1177bb;
+                transform: translateY(-1px);
+            }
+
+            button:active {
+                transform: translateY(0);
+            }
+
+        .btn-clear {
+            background: #6c757d;
+        }
+
+            .btn-clear:hover {
+                background: #5a6268;
+            }
+
+        .btn-test {
+            background: #28a745;
+        }
+
+            .btn-test:hover {
+                background: #218838;
+            }
+
+        .status {
+            background: #2d2d30;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-family: monospace;
+        }
+
+            .status.success {
+                background: #1e3a2f;
+                border-left: 4px solid #6a9955;
+            }
+
+            .status.error {
+                background: #3a1e1e;
+                border-left: 4px solid #f48771;
+            }
+
+            .status.info {
+                background: #1e2a3a;
+                border-left: 4px solid #61dafb;
+            }
+
+        .examples {
+            margin-top: 20px;
+            padding: 15px;
+            background: #2d2d30;
+            border-radius: 8px;
+        }
+
+            .examples h3 {
+                color: #61dafb;
+                margin-bottom: 10px;
+            }
+
+        .example-item {
+            background: #252526;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .example-item:hover {
+                background: #3e3e42;
+                transform: translateX(5px);
+            }
+
+        .example-title {
+            font-weight: bold;
+            color: #ce9178;
+        }
+
+        .example-desc {
+            font-size: 12px;
+            color: #8b949e;
+            margin-top: 5px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #61dafb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-text {
+            color: #f48771;
+        }
+
+        .success-text {
+            color: #6a9955;
+        }
+
+        hr {
+            border-color: #3e3e42;
+            margin: 15px 0;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            button {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 IAS-2025 Компилятор</h1>
+        <p class="subtitle">Тестирование бэкенда | Трансляция → ASM → Компиляция → Выполнение</p>
+
+        <div class="button-group">
+            <button onclick="executeCode()" id="executeBtn">
+                <i>▶</i> Выполнить программу
+            </button>
+            <button onclick="checkHealth()" class="btn-test">
+                <i>⚡</i> Проверить бэкенд
+            </button>
+            <button onclick="clearOutput()" class="btn-clear">
+                <i>🗑</i> Очистить вывод
+            </button>
+            <button onclick="resetCode()" class="btn-clear">
+                <i>🔄</i> Сбросить код
+            </button>
+        </div>
+
+        <div class="grid">
+            <div class="panel">
+                <div class="panel-header">
+                    <i>📝</i> Код на языке IAS-2025
+                </div>
+                <textarea id="codeArea">#Пример программы на языке IAS-2025
+main{
+    int var a = 10; #инициализация переменной int
+    int var b = 10; #инициализация переменной int
+    int var res = a + b; #результат сложения в переменную
+    output res;
+}</textarea>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <i>📤</i> Результат выполнения
+                </div>
+                <pre id="outputArea">// Нажмите "Выполнить программу" или "Проверить бэкенд"</pre>
+            </div>
+        </div>
+
+        <div class="status" id="statusArea">
+            💡 Готов к работе. Нажмите "Проверить бэкенд" для проверки соединения.
+        </div>
+
+        <div class="examples">
+            <h3>📚 Примеры кода для тестирования:</h3>
+            <div class="example-item" onclick="loadExample('simple')">
+                <div class="example-title">Простой пример</div>
+                <div class="example-desc">Сложение двух чисел и вывод результата</div>
+            </div>
+            <div class="example-item" onclick="loadExample('hello')">
+                <div class="example-title">Hello World</div>
+                <div class="example-desc">Вывод текстового сообщения</div>
+            </div>
+            <div class="example-item" onclick="loadExample('variables')">
+                <div class="example-title">Работа с переменными</div>
+                <div class="example-desc">Объявление и использование переменных разных типов</div>
+            </div>
+            <div class="example-item" onclick="loadExample('conditions')">
+                <div class="example-title">Условные операторы</div>
+                <div class="example-desc">Пример с условием if-then-else</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+
+        // Примеры кода
+        const examples = {
+            simple: `#Пример программы на языке IAS-2025
+main{
+    int var a = 10;
+    int var b = 10;
+    int var res = a + b;
+    output res;
+}`,
+
+            hello: `#Программа Hello World
+main{
+    output "Hello World!";
+    output "Добро пожаловать в IAS-2025!";
+}`,
+
+            variables: `#Работа с переменными
+main{
+    int var age = 25;
+    str var name = "Иван";
+    bool var isActive = true;
+
+    output "Имя: ";
+    output name;
+    output "Возраст: ";
+    output age;
+    output "Активен: ";
+    output isActive;
+}`,
+
+            conditions: `#Условный оператор
+main{
+    int var score = 85;
+
+    if (score >= 60)
+    then{
+        output "Тест пройден!";
+        output "Ваш балл: ";
+        output score;
+    }
+    else{
+        output "Тест не пройден";
+    }
+}`
+        };
+
+        // Функция загрузки примера
+        function loadExample(type) {
+            if (examples[type]) {
+                document.getElementById('codeArea').value = examples[type];
+                addToStatus(`✅ Загружен пример: ${type}`, 'info');
+            }
+        }
+
+        // Функция добавления в статус
+        function addToStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusArea');
+            const timestamp = new Date().toLocaleTimeString();
+            statusDiv.innerHTML = `[${timestamp}] ${message}<br>${statusDiv.innerHTML}`;
+            statusDiv.className = `status ${type}`;
+
+            // Ограничиваем историю 10 сообщениями
+            const lines = statusDiv.innerHTML.split('<br>');
+            if (lines.length > 10) {
+                statusDiv.innerHTML = lines.slice(0, 10).join('<br>');
+            }
+        }
+
+        // Очистка вывода
+        function clearOutput() {
+            document.getElementById('outputArea').innerHTML = '// Вывод очищен\n// Нажмите "Выполнить программу" для нового запуска';
+            addToStatus('🧹 Вывод очищен', 'info');
+        }
+
+        // Сброс кода к исходному
+        function resetCode() {
+            document.getElementById('codeArea').value = examples.simple;
+            addToStatus('🔄 Код сброшен к исходному примеру', 'info');
+        }
+
+        // Проверка здоровья бэкенда
+        async function checkHealth() {
+            const outputArea = document.getElementById('outputArea');
+            const executeBtn = document.getElementById('executeBtn');
+
+            addToStatus('🔍 Проверка соединения с бэкендом...', 'info');
+            outputArea.innerHTML = '⏳ Проверка подключения к серверу...\n';
+
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+
+                let statusHtml = '✅ БЭКЕНД ДОСТУПЕН\n\n';
+                statusHtml += '📊 Статус компонентов:\n';
+                statusHtml += '━'.repeat(40) + '\n';
+                statusHtml += `🔧 Транслятор (IAS-2025.exe): ${data.translator_available ? '✅ ДОСТУПЕН' : '❌ НЕ ДОСТУПЕН'}\n`;
+                statusHtml += `🛠️ Visual Studio (VCVARS): ${data.vcvars_available ? '✅ ДОСТУПНА' : '❌ НЕ ДОСТУПНА'}\n`;
+                statusHtml += `📁 Временная директория: ${data.temp_directory || 'Не указана'}\n\n`;
+                statusHtml += '📂 Пути:\n';
+                statusHtml += `   Транслятор: ${data.translator_path || 'Не указан'}\n`;
+                statusHtml += `   VCVARS: ${data.vcvars_path || 'Не указан'}\n\n`;
+
+                if (data.translator_available && data.vcvars_available) {
+                    statusHtml += '✨ СТАТУС: Система готова к выполнению программ!\n';
+                    statusHtml += '💡 Нажмите "Выполнить программу" для тестирования.';
+                    addToStatus('✅ Бэкенд готов к работе!', 'success');
+                } else if (data.translator_available) {
+                    statusHtml += '⚠️ ПРЕДУПРЕЖДЕНИЕ: Visual Studio не найдена\n';
+                    statusHtml += '💡 Убедитесь что Visual Studio установлена и путь к vcvarsall.bat правильный.';
+                    addToStatus('⚠️ Visual Studio не найдена, проверьте путь в main.py', 'error');
+                } else {
+                    statusHtml += '❌ ОШИБКА: Транслятор не найден\n';
+                    statusHtml += '💡 Убедитесь что IAS-2025.exe находится по правильному пути.';
+                    addToStatus('❌ Транслятор не найден!', 'error');
+                }
+
+                outputArea.innerHTML = statusHtml;
+
+            } catch (error) {
+                const errorMsg = `❌ ОШИБКА ПОДКЛЮЧЕНИЯ\n\n` +
+                                `Не удалось подключиться к бэкенду по адресу: ${API_URL}\n\n` +
+                                `💡 Возможные причины:\n` +
+                                `1. Бэкенд не запущен\n` +
+                                `2. Неправильный порт (должен быть 8000)\n` +
+                                `3. Брандмауэр блокирует соединение\n\n` +
+                                `🛠️ Решение:\n` +
+                                `Запустите бэкенд командой:\n` +
+                                `cd D:\\BGTU\\IAS-2025\\IAS-2025\\OnlineCompiler\\backend\n` +
+                                `python main.py\n\n` +
+                                `🔧 Ошибка: ${error.message}`;
+
+                outputArea.innerHTML = errorMsg;
+                addToStatus(`❌ Ошибка подключения: ${error.message}`, 'error');
+            }
+        }
+
+        // Выполнение кода
+        async function executeCode() {
+            const code = document.getElementById('codeArea').value;
+            const outputArea = document.getElementById('outputArea');
+            const executeBtn = document.getElementById('executeBtn');
+
+            if (!code.trim()) {
+                outputArea.innerHTML = '❌ ОШИБКА: Введите код для выполнения';
+                addToStatus('❌ Попытка выполнения пустого кода', 'error');
+                return;
+            }
+
+            // Показываем загрузку
+            const originalText = executeBtn.innerHTML;
+            executeBtn.innerHTML = '⏳ Выполнение... <span class="loading"></span>';
+            executeBtn.disabled = true;
+
+            outputArea.innerHTML = '🔄 Трансляция и выполнение программы...\n\n';
+            outputArea.innerHTML += 'Шаг 1: Отправка кода на сервер...\n';
+            addToStatus('🚀 Отправка кода на выполнение...', 'info');
+
+            try {
+                const startTime = Date.now();
+
+                const response = await fetch(`${API_URL}/execute`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        code: code
+                    })
+                });
+
+                const data = await response.json();
+                const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
+
+                if (response.ok && data.success) {
+                    // Успешное выполнение
+                    let resultHtml = '✅ ПРОГРАММА ВЫПОЛНЕНА УСПЕШНО!\n';
+                    resultHtml += '━'.repeat(50) + '\n';
+                    resultHtml += `⏱️ Время выполнения: ${elapsedTime} сек\n`;
+                    resultHtml += '━'.repeat(50) + '\n\n';
+                    resultHtml += '📤 ВЫВОД ПРОГРАММЫ:\n';
+                    resultHtml += '━'.repeat(40) + '\n';
+                    resultHtml += data.output || '(программа не вывела данных)\n';
+                    resultHtml += '━'.repeat(40) + '\n';
+
+                    if (data.error) {
+                        resultHtml += '\n⚠️ ПРЕДУПРЕЖДЕНИЯ:\n';
+                        resultHtml += data.error + '\n';
+                    }
+
+                    outputArea.innerHTML = resultHtml;
+                    addToStatus(`✅ Программа выполнена за ${elapsedTime} сек`, 'success');
+
+                } else {
+                    // Ошибка выполнения
+                    let errorHtml = '❌ ОШИБКА ВЫПОЛНЕНИЯ\n';
+                    errorHtml += '━'.repeat(50) + '\n';
+                    errorHtml += `⏱️ Время: ${elapsedTime} сек\n`;
+                    errorHtml += '━'.repeat(50) + '\n\n';
+                    errorHtml += '🔍 ДЕТАЛИ ОШИБКИ:\n';
+                    errorHtml += data.message || 'Неизвестная ошибка\n\n';
+
+                    if (data.error) {
+                        errorHtml += '📋 ТЕКСТ ОШИБКИ:\n';
+                        errorHtml += data.error + '\n';
+                    }
+
+                    if (data.output) {
+                        errorHtml += '\n📤 ВЫВОД ПРОГРАММЫ:\n';
+                        errorHtml += data.output + '\n';
+                    }
+
+                    outputArea.innerHTML = errorHtml;
+                    addToStatus(`❌ Ошибка выполнения: ${data.message || 'Неизвестная ошибка'}`, 'error');
+                }
+
+            } catch (error) {
+                const errorHtml = `❌ СЕТЕВАЯ ОШИБКА\n\n` +
+                                 `Не удалось连接到 серверу: ${API_URL}\n\n` +
+                                 `🔧 Ошибка: ${error.message}\n\n` +
+                                 `💡 Решение:\n` +
+                                 `1. Убедитесь что бэкенд запущен: python main.py\n` +
+                                 `2. Проверьте адрес: http://localhost:8000\n` +
+                                 `3. Нажмите "Проверить бэкенд" для диагностики`;
+
+                outputArea.innerHTML = errorHtml;
+                addToStatus(`❌ Сетевая ошибка: ${error.message}`, 'error');
+
+            } finally {
+                // Восстанавливаем кнопку
+                executeBtn.innerHTML = originalText;
+                executeBtn.disabled = false;
+            }
+        }
+
+        // Обработка Ctrl+Enter для выполнения
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                executeCode();
+            }
+        });
+
+        // Автоматическая проверка при загрузке страницы
+        window.addEventListener('load', () => {
+            addToStatus('🌟 Страница загружена. Проверяю подключение к бэкенду...', 'info');
+            setTimeout(() => {
+                checkHealth();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+﻿<Window x:Class="SimpleIDE.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SimpleIDE" Height="800" Width="1400"
+        WindowStartupLocation="CenterScreen"
+        Background="#1E1E1E">
+
+    <Window.Resources>
+        <!-- Стиль для разделителя -->
+        <Style x:Key="GridSplitterStyle" TargetType="GridSplitter">
+            <Setter Property="Background" Value="#3C3C3C"/>
+            <Setter Property="Height" Value="5"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Cursor" Value="SizeNS"/>
+        </Style>
+
+        <!-- Стиль для вкладок -->
+        <Style x:Key="TabItemStyle" TargetType="TabItem">
+            <Setter Property="Background" Value="#2C2C2C"/>
+            <Setter Property="Foreground" Value="#858585"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="Border" Background="{TemplateBinding Background}"
+                                BorderBrush="#3C3C3C" BorderThickness="0,0,0,1">
+                            <ContentPresenter x:Name="ContentSite" 
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Center"
+                                            ContentSource="Header"
+                                            Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#1E1E1E"/>
+                                <Setter TargetName="Border" Property="BorderThickness" Value="0,0,0,2"/>
+                                <Setter Property="Foreground" Value="#4CAF50"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#D4D4D4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Левая панель - файловый менеджер -->
+        <Border Grid.Column="0" Background="#2C2C2C">
+            <DockPanel>
+                <!-- Заголовок -->
+                <Border DockPanel.Dock="Top" Background="#3C3C3C" Padding="15">
+                    <StackPanel>
+                        <TextBlock Text="Мои проекты" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Правой кнопкой мыши для создания" FontSize="11" Foreground="#858585" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Дерево файлов -->
+                <TreeView x:Name="FileTreeView" Background="#2C2C2C" BorderThickness="0" Margin="0,10,5,0">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="TreeViewItem">
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="FontSize" Value="13"/>
+                            <Setter Property="Padding" Value="5"/>
+                            <Setter Property="Cursor" Value="Hand"/>
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="📁 Создать папку" Click="CreateRootFolder_Click"/>
+                            <MenuItem Header="📄 Создать файл" Click="CreateRootFile_Click"/>
+                            <Separator/>
+                            <MenuItem Header="🔄 Обновить" Click="Refresh_Click"/>
+                        </ContextMenu>
+                    </TreeView.ContextMenu>
+                </TreeView>
+            </DockPanel>
+        </Border>
+
+        <!-- Правая панель - редактор и вывод -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="300"/>
+            </Grid.RowDefinitions>
+
+            <!-- Верхняя панель инструментов -->
+            <Border Grid.Row="0" Background="#252526" Padding="10"
+                    BorderBrush="#3C3C3C" BorderThickness="0,0,0,1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <Button Content="▶ Запустить" Background="#4CAF50"
+                                Style="{StaticResource ModernButton}" Click="RunCode_Click"/>
+                        <Button Content="📋 Пример" Background="#FF9800"
+                                Style="{StaticResource ModernButton}" Click="LoadExample_Click" Margin="5,0,0,0"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <Button x:Name="AdminButton" Content="👑 Стать администратором" 
+                                Background="#FF9800" Style="{StaticResource ModernButton}" 
+                                Click="BecomeAdmin_Click" Visibility="Collapsed"/>
+                        <Button x:Name="UserManagementButton" Content="👥 Пользователи" 
+                                Background="#2196F3" Style="{StaticResource ModernButton}" 
+                                Click="UserManagement_Click" Visibility="Collapsed"/>
+                        <Button Content="🔄 Обновить" Background="#6C63FF" 
+                                Style="{StaticResource ModernButton}" Click="Refresh_Click"/>
+                        <Button Content="🚪 Выйти" Background="#F44336" 
+                                Style="{StaticResource ModernButton}" Click="Logout_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Редактор кода с вкладками -->
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Вкладки файлов -->
+                <Border Grid.Row="0" Background="#2C2C2C">
+                    <TabControl x:Name="FileTabs" TabStripPlacement="Top"
+                                SelectionChanged="FileTab_SelectionChanged"
+                                Background="#2C2C2C" BorderThickness="0">
+                        <TabControl.ItemContainerStyle>
+                            <Style TargetType="TabItem" BasedOn="{StaticResource TabItemStyle}"/>
+                        </TabControl.ItemContainerStyle>
+                    </TabControl>
+                </Border>
+
+                <!-- Редактор кода -->
+                <TextBox x:Name="CodeEditor" Grid.Row="1" Background="#1E1E1E" 
+                         Foreground="#D4D4D4" FontFamily="Consolas" FontSize="14" 
+                         TextWrapping="Wrap" AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                         BorderThickness="0" Padding="15" 
+                         CaretBrush="#4CAF50" 
+                         TextChanged="CodeEditor_TextChanged"
+                         SpellCheck.IsEnabled="False"/>
+            </Grid>
+
+            <!-- Разделитель -->
+            <GridSplitter Grid.Row="2" Style="{StaticResource GridSplitterStyle}" ResizeDirection="Rows"/>
+
+            <!-- Нижняя панель - вывод -->
+            <Border Grid.Row="3" Background="#1E1E1E" BorderBrush="#3C3C3C" BorderThickness="0,1,0,0">
+                <DockPanel>
+                    <Border DockPanel.Dock="Top" Background="#252526" Padding="10,5">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Text="📋 ВЫВОД ПРОГРАММЫ" 
+                                       Foreground="#858585" FontSize="12" FontWeight="Bold"/>
+
+                            <TextBlock Grid.Column="1" x:Name="FileInfoText" 
+                                       Text="" Foreground="#858585" FontSize="11"
+                                       VerticalAlignment="Center" Margin="15,0,0,0"/>
+
+                            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                <Button Content="📋 Копировать" Background="#2C2C2C" 
+                                        Style="{StaticResource ModernButton}" Height="25"
+                                        FontSize="11" Click="CopyOutput_Click"/>
+                                <Button Content="🗑 Очистить" Background="#2C2C2C" 
+                                        Style="{StaticResource ModernButton}" Height="25"
+                                        FontSize="11" Click="ClearOutput_Click" Margin="5,0,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <TextBox x:Name="OutputBox" Background="#1E1E1E" Foreground="#D4D4D4" 
+                             FontFamily="Consolas" FontSize="13" TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto" IsReadOnly="True"
+                             BorderThickness="0" Padding="10" 
+                             Text="✨ Добро пожаловать в SimpleIDE для IAS-2025! ✨
+
+📝 Как работать:
+1. Нажмите правой кнопкой мыши на левой панели
+2. Создайте новый файл (например, main.ias)
+3. Дважды кликните на файле для открытия
+4. Напишите код в редакторе
+5. Нажмите ▶ Запустить
+6. Результат появится здесь
+
+💡 Советы:
+• Можно открыть несколько файлов - они будут во вкладках
+• Размер панелей можно менять перетаскиванием разделителя
+• Код автоматически сохраняется при редактировании
+
+📚 Пример кода:
+main{
+    output &quot;Hello, World!&quot;;
+    output &quot;Добро пожаловать в IAS-2025!&quot;;
+}"/>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
