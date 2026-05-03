@@ -130,7 +130,6 @@ namespace SimpleIDE.Views
 
         private void OpenFile(FileItem file)
         {
-            // Проверяем, не открыт ли уже этот файл
             var existingTab = _openFiles.FirstOrDefault(x => x.Value.Id == file.Id).Key;
             if (existingTab != null)
             {
@@ -138,7 +137,6 @@ namespace SimpleIDE.Views
                 return;
             }
 
-            // Создаем новую вкладку
             var tabItem = new TabItem
             {
                 Header = file.Name,
@@ -147,7 +145,6 @@ namespace SimpleIDE.Views
 
             FileTabs.Items.Add(tabItem);
             _openFiles[tabItem] = file;
-
             FileTabs.SelectedItem = tabItem;
             LoadFileToEditor(file);
         }
@@ -158,10 +155,10 @@ namespace SimpleIDE.Views
             var content = file.Content ?? "";
             content = content.Replace("\r\n", "\n");
             CodeEditor.Text = content;
-            FileInfoText.Text = $"📄 {file.Name} | Строк: {content.Split('\n').Length} | Символов: {content.Length}";
-            CodeEditor.IsEnabled = true;
-            CodeEditor.Focus();
-            CodeEditor.CaretIndex = CodeEditor.Text.Length;
+            var lines = content.Split('\n').Length;
+            var chars = content.Length;
+            FileInfoText.Text = $"📄 {file.Name} | Строк: {lines} | Символов: {chars}";
+            CodeEditor.FocusEditor();
         }
 
         private void FileTab_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -173,15 +170,15 @@ namespace SimpleIDE.Views
             }
         }
 
-        private async void CodeEditor_TextChanged(object sender, TextChangedEventArgs e)
+        private async void CodeEditor_TextChanged(object sender, EventArgs e)
         {
-            if (_currentFile != null)
+            if (_currentFile != null && CodeEditor != null)
             {
                 await App.FileSystemService.UpdateFileContentAsync(_currentFile.Id, CodeEditor.Text);
-
-                // Обновляем информацию о файле
                 var content = CodeEditor.Text;
-                FileInfoText.Text = $"📄 {_currentFile.Name} | Строк: {content.Split('\n').Length} | Символов: {content.Length} ✨ сохранено";
+                var lines = content.Split('\n').Length;
+                var chars = content.Length;
+                FileInfoText.Text = $"📄 {_currentFile.Name} | Строк: {lines} | Символов: {chars} ✨ сохранено";
             }
         }
 
@@ -251,7 +248,6 @@ namespace SimpleIDE.Views
             {
                 await App.FileSystemService.DeleteFileAsync(file.Id);
 
-                // Закрываем вкладку если файл был открыт
                 var tabToClose = _openFiles.FirstOrDefault(x => x.Value.Id == file.Id).Key;
                 if (tabToClose != null)
                 {
@@ -293,6 +289,18 @@ namespace SimpleIDE.Views
     int var sum = a + b;
     output ""Сумма: "";
     output sum;
+    
+    // Пример условного оператора
+    if (a > b) then{
+        output ""a больше b"";
+    } else{
+        output ""b больше a"";
+    }
+    
+    // Пример цикла
+    repeat(10){
+        output ""Итерация"";
+    }
 }";
 
             CodeEditor.Text = exampleCode;
