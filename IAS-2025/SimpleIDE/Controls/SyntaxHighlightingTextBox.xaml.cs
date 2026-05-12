@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
@@ -177,6 +178,49 @@ namespace SimpleIDE.Controls
                 _completionWindow.Show();
                 _completionWindow.Closed += (s, e) => _completionWindow = null;
             }
+        }
+        // Метод для преобразования в шаблон main
+        private void ConvertToMainTemplate_Click(object sender, RoutedEventArgs e)
+        {
+            var template = @"main{
+    output ""Hello World!"";
+}";
+
+            Editor.Text = template;
+
+            // Устанавливаем курсор на позицию после main{
+            var lines = template.Split('\n');
+            if (lines.Length >= 2)
+            {
+                var line2Start = lines[0].Length + 1; // +1 для перевода строки
+                Editor.TextArea.Caret.Offset = line2Start + 4; // 4 пробела
+            }
+
+            // Уведомляем об изменении
+            Text = template;
+            SetValue(TextProperty, template);
+        }
+
+        private void Copy_Click(object sender, RoutedEventArgs e)
+        {
+            Editor.Copy();
+        }
+
+        private void Cut_Click(object sender, RoutedEventArgs e)
+        {
+            Editor.Cut();
+        }
+
+        private void Paste_Click(object sender, RoutedEventArgs e)
+        {
+            Editor.Paste();
+        }
+
+        private void ClearAll_Click(object sender, RoutedEventArgs e)
+        {
+            Editor.Clear();
+            Text = "";
+            SetValue(TextProperty, "");
         }
 
         private string GetCurrentWord()
