@@ -357,7 +357,7 @@ output sum;
 str var stringOne = ""Hello, my name is Arseniy"";
 str var stringTwo = ""Hello, my name is Alex"";
 
-output ""Первых три элемента, скопированных из первой строки во вторую :"";
+output ""Первые три элемента, скопированные из первой строки во вторую :"";
 str var ns = copy(stringOne, stringTwo, 3 );
 output ns;
 output stringOne;

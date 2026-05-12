@@ -112,13 +112,14 @@ namespace SimpleIDE.Controls
         
         <!-- Функции библиотеки -->
         <Keywords color=""Function"">
-            <Word>length</Word>
+            <Word>lenght</Word>
             <Word>copy</Word>
             <Word>random</Word>
             <Word>factorialOfNumber</Word>
             <Word>squareOfNumber</Word>
             <Word>asciiCode</Word>
             <Word>getLocalTimeAndDate</Word>
+            <Word>powNumber</Word>
         </Keywords>
         
         <!-- Числа -->
