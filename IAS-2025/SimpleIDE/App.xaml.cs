@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SimpleIDE.Data;
+using SimpleIDE.Models;
 using SimpleIDE.Services;
 using SimpleIDE.Views;
 using System.Net.Http;
@@ -22,8 +23,7 @@ namespace SimpleIDE
 
             AuthService = new AuthService(DbContext);
             FileSystemService = new FileSystemService(DbContext, AuthService);
-            TemplateService = new TemplateService(DbContext, AuthService); // <-- ДОБАВЬ ЭТУ СТРОКУ
-
+            TemplateService = new TemplateService(AuthService);
             var httpClient = new HttpClient();
             httpClient.Timeout = TimeSpan.FromSeconds(60);
             BackendService = new BackendService(httpClient);
@@ -38,6 +38,70 @@ namespace SimpleIDE
         {
             DbContext?.Dispose();
             base.OnExit(e);
+        }
+    }
+    public class TemplateService
+    {
+        private readonly AuthService _authService;
+
+        public TemplateService(AuthService authService)
+        {
+            _authService = authService;
+        }
+
+        public async Task<List<Template>> GetUserTemplatesAsync()
+        {
+            if (_authService.CurrentUser == null)
+                return new List<Template>();
+
+            using (var context = new ApplicationDbContext())
+            {
+                return await context.Templates
+                    .Where(t => t.UserId == _authService.CurrentUser.Id || t.IsSystem)
+                    .OrderByDescending(t => t.IsSystem)
+                    .ThenBy(t => t.Name)
+                    .ToListAsync();
+            }
+        }
+
+        public async Task<Template?> AddTemplateAsync(string name, string content, string? description = null)
+        {
+            if (_authService.CurrentUser == null)
+                return null;
+
+            using (var context = new ApplicationDbContext())
+            {
+                var template = new Template
+                {
+                    Name = name,
+                    Content = content,
+                    Description = description,
+                    UserId = _authService.CurrentUser.Id,
+                    IsSystem = false,
+                    CreatedAt = DateTime.Now
+                };
+
+                context.Templates.Add(template);
+                await context.SaveChangesAsync();
+                return template;
+            }
+        }
+
+        public async Task<bool> DeleteTemplateAsync(int templateId)
+        {
+            using (var context = new ApplicationDbContext())
+            {
+                var template = await context.Templates.FindAsync(templateId);
+                if (template == null || template.IsSystem)
+                    return false;
+
+                if (template.UserId != _authService.CurrentUser?.Id)
+                    return false;
+
+                context.Templates.Remove(template);
+                await context.SaveChangesAsync();
+                return true;
+            }
         }
     }
 }

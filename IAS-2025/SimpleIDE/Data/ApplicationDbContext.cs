@@ -26,7 +26,9 @@ namespace SimpleIDE.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Data Source=localhost\\SQLEXPRESS;Initial Catalog=SimpleIDE;Integrated Security=True;TrustServerCertificate=True");
+                optionsBuilder.UseSqlServer("Data Source=localhost\\SQLEXPRESS;Initial Catalog=SimpleIDE;Integrated Security=True;TrustServerCertificate=True")
+                    .EnableSensitiveDataLogging(false)
+                    .EnableDetailedErrors(false);
             }
         }
 
