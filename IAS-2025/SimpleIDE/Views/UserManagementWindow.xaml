@@ -17,17 +17,10 @@
         <DataGrid x:Name="UsersGrid" Grid.Row="1" AutoGenerateColumns="False" 
                   CanUserAddRows="False" SelectionMode="Single">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
-                <DataGridTextColumn Header="Имя пользователя" Binding="{Binding Username}" Width="200"/>
-                <DataGridTextColumn Header="Дата регистрации" Binding="{Binding CreatedAt}" Width="150"/>
-                <DataGridTemplateColumn Header="Статус" Width="100">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsAdmin, UpdateSourceTrigger=PropertyChanged}"
-                                      IsEnabled="True"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Имя пользователя" Binding="{Binding Username}" Width="200" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Дата регистрации" Binding="{Binding CreatedAt}" Width="150" IsReadOnly="True"/>
+                <DataGridCheckBoxColumn Header="Администратор" Binding="{Binding IsAdmin}" Width="100"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

@@ -50,9 +50,37 @@ namespace SimpleIDE.Services
             return false;
         }
 
+        // Принудительное обновление текущего пользователя из БД
+        public async Task RefreshCurrentUserAsync()
+        {
+            if (_currentUser != null)
+            {
+                var freshUser = await _context.Users
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.Id == _currentUser.Id);
+
+                if (freshUser != null)
+                {
+                    _currentUser = freshUser;
+                    System.Diagnostics.Debug.WriteLine($"User {_currentUser.Username} refreshed. IsAdmin: {_currentUser.IsAdmin}");
+                }
+            }
+        }
+
+        // Проверка прав администратора напрямую из БД
+        public async Task<bool> IsAdminRealTimeAsync()
+        {
+            if (_currentUser == null) return false;
+
+            var user = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == _currentUser.Id);
+
+            return user?.IsAdmin ?? false;
+        }
+
         public async Task<bool> MakeAdminAsync(string password, int userId)
         {
-            // Пароль администратора для получения прав
             if (password != "AdminPass123!") return false;
 
             var user = await _context.Users.FindAsync(userId);
@@ -62,7 +90,9 @@ namespace SimpleIDE.Services
             await _context.SaveChangesAsync();
 
             if (_currentUser?.Id == userId)
+            {
                 _currentUser.IsAdmin = true;
+            }
 
             return true;
         }
@@ -74,14 +104,25 @@ namespace SimpleIDE.Services
 
         public async Task<bool> SetAdminRoleAsync(int userId, bool isAdmin)
         {
-            if (!IsAdmin) return false;
-
             var user = await _context.Users.FindAsync(userId);
             if (user == null) return false;
 
             user.IsAdmin = isAdmin;
             await _context.SaveChangesAsync();
+
+            // Если меняем текущего пользователя - обновляем его
+            if (_currentUser?.Id == userId)
+            {
+                _currentUser.IsAdmin = isAdmin;
+            }
+
+            System.Diagnostics.Debug.WriteLine($"User {user.Username} admin status changed to: {isAdmin}");
             return true;
+        }
+
+        public async Task<User?> GetUserByIdAsync(int userId)
+        {
+            return await _context.Users.FindAsync(userId);
         }
 
         public void Logout()

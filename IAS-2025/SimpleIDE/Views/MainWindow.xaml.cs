@@ -16,7 +16,7 @@ namespace SimpleIDE.Views
             UpdateAdminUI();
         }
 
-        private void UpdateAdminUI()
+        public void UpdateAdminUI()
         {
             if (App.AuthService.IsAdmin)
             {
@@ -32,8 +32,12 @@ namespace SimpleIDE.Views
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            await App.AuthService.RefreshCurrentUserAsync();
+
             await LoadFileTree();
             await CheckBackendConnection();
+
+            UpdateAdminUI();    
         }
 
         private async Task CheckBackendConnection()
@@ -349,11 +353,29 @@ namespace SimpleIDE.Views
             }
         }
 
-        private void UserManagement_Click(object sender, RoutedEventArgs e)
+        private async void UserManagement_Click(object sender, RoutedEventArgs e)
         {
+            // Проверяем права администратора в реальном времени
+            var isAdmin = await App.AuthService.IsAdminRealTimeAsync();
+
+            if (!isAdmin)
+            {
+                MessageBox.Show("У вас нет прав администратора! Ваши права были отозваны.",
+                    "Доступ запрещен", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                // Обновляем статус в UI
+                await App.AuthService.RefreshCurrentUserAsync();
+                UpdateAdminUI();
+                return;
+            }
+
             var userWindow = new UserManagementWindow();
             userWindow.Owner = this;
             userWindow.ShowDialog();
+
+            // После закрытия окна управления обновляем статус
+            await App.AuthService.RefreshCurrentUserAsync();
+            UpdateAdminUI();
         }
 
         private void Logout_Click(object sender, RoutedEventArgs e)
