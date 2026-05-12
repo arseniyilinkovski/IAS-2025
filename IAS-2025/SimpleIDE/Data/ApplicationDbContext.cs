@@ -19,6 +19,8 @@ namespace SimpleIDE.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Folder> Folders { get; set; }
         public DbSet<FileItem> Files { get; set; }
+        public DbSet<Template> Templates { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -14,33 +14,36 @@
                            WordWrap="True">
             <avalon:TextEditor.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="📝 Преобразовать в шаблон main" Click="ConvertToMainTemplate_Click">
-                        <MenuItem.ToolTip>
-                            <ToolTip>Заменяет весь код на шаблон main с выводом "Hello World"</ToolTip>
-                        </MenuItem.ToolTip>
+                    <!-- Системные шаблоны -->
+                    <MenuItem Header="📝 Вставить шаблон">
+                        <MenuItem Header="⭐ main (стандартный)" Click="InsertMainTemplate_Click"/>
+                        <MenuItem Header="⭐ main с переменными" Click="InsertMainWithVarTemplate_Click"/>
+                        <MenuItem Header="⭐ Функция (пустая)" Click="InsertFunctionTemplate_Click"/>
+                        <MenuItem Header="⭐ Цикл repeat" Click="InsertRepeatTemplate_Click"/>
+                        <MenuItem Header="⭐ Условный оператор if" Click="InsertIfTemplate_Click"/>
+                        <Separator/>
+
+                        <!-- Пользовательские шаблоны -->
+                        <MenuItem x:Name="UserTemplatesMenu" Header="🔧 Мои шаблоны"/>
                     </MenuItem>
+
                     <Separator/>
-                    <MenuItem Header="📋 Копировать" Click="Copy_Click">
-                        <MenuItem.Icon>
-                            <TextBlock Text="📋" FontSize="14"/>
-                        </MenuItem.Icon>
+
+                    <MenuItem Header="➕ Добавить выделенное как шаблон" Click="AddAsTemplate_Click"/>
+
+                    <MenuItem x:Name="ManageTemplatesMenu" Header="⚙️ Управление шаблонами">
+                        <MenuItem Header="📋 Показать все шаблоны" Click="ShowAllTemplates_Click"/>
+                        <Separator/>
+                        <MenuItem Header="🗑 Очистить мои шаблоны" Click="ClearUserTemplates_Click"/>
                     </MenuItem>
-                    <MenuItem Header="✂️ Вырезать" Click="Cut_Click">
-                        <MenuItem.Icon>
-                            <TextBlock Text="✂️" FontSize="14"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Header="📄 Вставить" Click="Paste_Click">
-                        <MenuItem.Icon>
-                            <TextBlock Text="📄" FontSize="14"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
+
                     <Separator/>
-                    <MenuItem Header="🗑 Очистить всё" Click="ClearAll_Click">
-                        <MenuItem.Icon>
-                            <TextBlock Text="🗑" FontSize="14"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
+
+                    <MenuItem Header="📋 Копировать" Click="Copy_Click"/>
+                    <MenuItem Header="✂️ Вырезать" Click="Cut_Click"/>
+                    <MenuItem Header="📄 Вставить" Click="Paste_Click"/>
+                    <Separator/>
+                    <MenuItem Header="🗑 Очистить всё" Click="ClearAll_Click"/>
                 </ContextMenu>
             </avalon:TextEditor.ContextMenu>
         </avalon:TextEditor>

@@ -9,10 +9,11 @@ namespace SimpleIDE
 {
     public partial class App : Application
     {
-        public static ApplicationDbContext DbContext { get; private set; }
-        public static AuthService AuthService { get; private set; }
-        public static FileSystemService FileSystemService { get; private set; }
-        public static BackendService BackendService { get; private set; }
+        public static ApplicationDbContext DbContext { get; private set; } = null!;
+        public static AuthService AuthService { get; private set; } = null!;
+        public static FileSystemService FileSystemService { get; private set; } = null!;
+        public static BackendService BackendService { get; private set; } = null!;
+        public static TemplateService TemplateService { get; private set; } = null!;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -21,8 +22,8 @@ namespace SimpleIDE
 
             AuthService = new AuthService(DbContext);
             FileSystemService = new FileSystemService(DbContext, AuthService);
+            TemplateService = new TemplateService(DbContext, AuthService); // <-- ДОБАВЬ ЭТУ СТРОКУ
 
-            // Создаем HttpClient с правильными настройками
             var httpClient = new HttpClient();
             httpClient.Timeout = TimeSpan.FromSeconds(60);
             BackendService = new BackendService(httpClient);
