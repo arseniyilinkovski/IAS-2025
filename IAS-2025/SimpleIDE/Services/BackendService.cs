@@ -18,10 +18,9 @@ namespace SimpleIDE.Services
         {
             try
             {
-                // Нормализуем переносы строк: заменяем \r\n на \n
+                // Нормализуем переносы строк
                 var normalizedCode = code.Replace("\r\n", "\n").Replace("\r", "\n");
 
-                // Убираем лишние пробелы в конце строк
                 var lines = normalizedCode.Split('\n');
                 for (int i = 0; i < lines.Length; i++)
                 {
@@ -34,33 +33,74 @@ namespace SimpleIDE.Services
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                 var response = await _httpClient.PostAsync($"{BASE_URL}/api/execute", content);
-                var responseText = await response.Content.ReadAsStringAsync();
 
-                if (response.IsSuccessStatusCode)
+                // Читаем как массив байтов
+                var responseBytes = await response.Content.ReadAsByteArrayAsync();
+
+                // Конвертируем из CP1251 в UTF-8
+                var win1251 = Encoding.GetEncoding(1251);
+                var responseText = win1251.GetString(responseBytes);
+
+                var result = JsonConvert.DeserializeObject<ExecuteResponse>(responseText);
+
+                if (result != null && result.success)
                 {
-                    var result = JsonConvert.DeserializeObject<ExecuteResponse>(responseText);
-
-                    if (result != null && result.success)
-                    {
-                        return result.output;
-                    }
-                    else if (result != null)
-                    {
-                        return $"Ошибка: {result.error}\n\n{result.output}";
-                    }
-                    else
-                    {
-                        return responseText;
-                    }
+                    // Ручная замена проблемных символов
+                    var fixedOutput = FixRussianX(result.output);
+                    return fixedOutput;
+                }
+                else if (result != null)
+                {
+                    var fixedError = FixRussianX(result.error);
+                    var fixedOutput = FixRussianX(result.output);
+                    return $"Ошибка: {fixedError}\n\n{fixedOutput}";
                 }
                 else
                 {
-                    return $"HTTP Error {response.StatusCode}: {responseText}";
+                    return FixRussianX(responseText);
                 }
             }
             catch (Exception ex)
             {
                 return $"Ошибка: {ex.Message}";
+            }
+        }
+
+        private string FixRussianX(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+
+            try
+            {
+                // Конвертируем обратно в байты CP1251, затем в UTF-8
+                var win1251 = Encoding.GetEncoding(1251);
+                var utf8 = Encoding.UTF8;
+
+                // Получаем байты в CP1251
+                var bytes = win1251.GetBytes(text);
+
+                // Специальная обработка для буквы "х" (0xF5)
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    if (bytes[i] == 0xF5) // Буква "х" в CP1251
+                    {
+                        // Заменяем на правильную UTF-8 последовательность
+                        var newBytes = new List<byte>();
+                        newBytes.AddRange(bytes.Take(i));
+                        newBytes.Add(0xD1); // Первый байт "х" в UTF-8
+                        newBytes.Add(0x85); // Второй байт "х" в UTF-8
+                        newBytes.AddRange(bytes.Skip(i + 1));
+                        bytes = newBytes.ToArray();
+                        i++; // Пропускаем добавленный байт
+                    }
+                }
+
+                // Конвертируем в UTF-8 строку
+                return utf8.GetString(bytes);
+            }
+            catch
+            {
+                return text;
             }
         }
 

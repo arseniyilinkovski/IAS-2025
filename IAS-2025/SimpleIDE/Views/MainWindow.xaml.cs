@@ -28,6 +28,7 @@ namespace SimpleIDE.Views
                 AdminButton.Visibility = Visibility.Visible;
                 UserManagementButton.Visibility = Visibility.Collapsed;
             }
+            UpdateUserInfo();
         }
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -284,27 +285,99 @@ namespace SimpleIDE.Views
 
         private void LoadExample_Click(object sender, RoutedEventArgs e)
         {
-            var exampleCode = @"main{
-    output ""Hello, World!"";
-    output ""Добро пожаловать в IAS-2025!"";
-    
-    int var a = 10;
-    int var b = 20;
-    int var sum = a + b;
-    output ""Сумма: "";
-    output sum;
-    
-    // Пример условного оператора
-    if (a > b) then{
-        output ""a больше b"";
-    } else{
-        output ""b больше a"";
-    }
-    
-    // Пример цикла
-    repeat(10){
-        output ""Итерация"";
-    }
+            var exampleCode = @"int function get_sum(int param argOne, int param argTwo){
+	int var res = argOne + argTwo;
+	return res;
+}
+
+bool function IsStringsEquals(str param StringOne, str param StringTwo){
+	bool var res;
+	int var lenOne = lenght(StringOne);
+	int var lenTwo = lenght(StringTwo);
+	if (lenOne & lenTwo)
+	then{
+		res = true;
+	}
+	else{
+		res = false;
+	}
+	return res;
+}	
+bool function IsEven(int param arg){
+	bool var res;
+	int var buf = arg % 2;
+	if (buf & 0)
+	then{
+		res = true;
+	}
+	else{
+		res = false;
+	}
+	return res;
+}
+main
+{
+output ""n"";
+str var date = getLocalTimeAndDate();
+output date;
+int var a = b1010; #10
+output ""Переменная a"";
+output a;
+int var b = h32; #50
+output ""Переменная b"";
+output b;
+int var rnd = random(a, b);
+output ""Случайное число от a до b"";
+output rnd;
+char var ch = 'c';
+int var code = asciiCode(ch);
+output ""Код ch"";
+output code;
+a = a >> 2; 	
+output ""a после сдвига вправо на 2"";
+output a;
+b = b << 2;
+output ""b после сдвига влево на 2"";
+output b;
+int var iter = 0;
+repeat(10){
+	output iter;
+	iter = iter + 1;
+}
+repeat(iter > 1){
+	output ""new iter"";
+	output iter;
+	iter = iter - 1;
+}
+
+output ""Выполнение функции get_sum(a, b)"";
+int var sum = get_sum(a, b);
+output sum;
+
+str var stringOne = ""Hello, my name is Arseniy"";
+str var stringTwo = ""Hello, my name is Alex"";
+
+output ""Первых три элемента, скопированных из первой строки во вторую :"";
+str var ns = copy(stringOne, stringTwo, 3 );
+output ns;
+output stringOne;
+output stringTwo;
+
+bool var flag = IsStringsEquals(stringOne,stringTwo);
+output flag;
+int var test = 2;
+output ""test:"";
+output test;
+test = powNumber(test, 3);
+output ""test после powNumber:"";
+output test;
+test = factorialOfNumber(test);
+output ""Факториал переменной test:"";
+output test;
+bool var evenFlag = IsEven(test);
+output evenFlag;
+int var oct = o12; #10
+output oct;
 }";
 
             CodeEditor.Text = exampleCode;
@@ -352,6 +425,36 @@ namespace SimpleIDE.Views
                 }
             }
         }
+        
+        // Обновление информации о пользователе 
+        private void UpdateUserInfo()
+        {
+            var currentUser = App.AuthService.CurrentUser;
+            if (currentUser != null)
+            {
+                UserNameText.Text = currentUser.Username;
+
+                if (App.AuthService.IsAdmin)
+                {
+                    AvatarText.Text = "👑";
+                    UserRoleText.Text = "Администратор";
+                    UserRoleText.Foreground = new System.Windows.Media.SolidColorBrush(
+                        System.Windows.Media.Color.FromRgb(156, 39, 176)); // Фиолетовый
+                }
+                else
+                {
+                    AvatarText.Text = GetAvatarLetter(currentUser.Username);
+                    UserRoleText.Text = "Пользователь";
+                    UserRoleText.Foreground = new System.Windows.Media.SolidColorBrush(
+                        System.Windows.Media.Color.FromRgb(76, 175, 80)); // Зеленый
+                }
+            }
+        }
+        private string GetAvatarLetter(string username)
+        {
+            if (string.IsNullOrEmpty(username)) return "?";
+            return username.Substring(0, 1).ToUpper();
+        }
 
         private async void UserManagement_Click(object sender, RoutedEventArgs e)
         {
@@ -377,6 +480,7 @@ namespace SimpleIDE.Views
             await App.AuthService.RefreshCurrentUserAsync();
             UpdateAdminUI();
         }
+
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
