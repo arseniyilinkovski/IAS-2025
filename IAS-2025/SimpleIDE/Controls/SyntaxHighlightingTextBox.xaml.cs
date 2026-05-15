@@ -4,6 +4,7 @@ using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using SimpleIDE.Services;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -70,8 +71,19 @@ namespace SimpleIDE.Controls
                     _isUpdating = false;
                 }
             };
+            ThemeService.ThemeChanged += OnThemeChanged;
         }
+        private void OnThemeChanged()
+        {
+            // Обновляем фон редактора
+            Editor.Background = (SolidColorBrush)Application.Current.Resources["BackgroundDark"];
+            Editor.Foreground = (SolidColorBrush)Application.Current.Resources["TextPrimary"];
 
+            // Пересоздаем подсветку
+            var currentText = Editor.Text;
+            Editor.SyntaxHighlighting = ThemeService.GetSyntaxHighlighting();
+            Editor.Text = currentText;
+        }
         private void OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (_completionWindow != null)
@@ -476,9 +488,19 @@ namespace SimpleIDE.Controls
                 return;
             }
 
-            var dialog = new Views.InputDialog("Введите название шаблона", false);
+            var dialog = new Views.InputDialog("✨ Введите название шаблона ✨", false);
             if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.Answer))
             {
+                // Проверка на существование шаблона с таким именем
+                var existingTemplates = await App.TemplateService.GetUserTemplatesAsync();
+                if (existingTemplates.Any(t => t.Name == dialog.Answer))
+                {
+                    var overwrite = MessageBox.Show($"Шаблон '{dialog.Answer}' уже существует. Перезаписать?",
+                        "Шаблон существует", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (overwrite != MessageBoxResult.Yes)
+                        return;
+                }
+
                 var template = await App.TemplateService.AddTemplateAsync(dialog.Answer, selectedText);
                 if (template != null)
                 {
@@ -488,7 +510,7 @@ namespace SimpleIDE.Controls
                 }
             }
         }
-        
+
     }
 
     public class CompletionData : ICompletionData

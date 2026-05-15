@@ -17,8 +17,8 @@
             <DockPanel>
                 <Border DockPanel.Dock="Top" Background="{StaticResource BackgroundPanel}" Padding="15">
                     <StackPanel>
-                        <TextBlock Text="Мои проекты" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextLight}"/>
-                        <TextBlock Text="Правой кнопкой мыши для создания" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,5,0,0"/>
+                        <TextBlock x:Name="LeftPanelTitle" Text="Мои проекты" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextLight}"/>
+                        <TextBlock x:Name="RightClickHint" Text="Правой кнопкой мыши для создания" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,5,0,0"/>
                     </StackPanel>
                 </Border>
 
@@ -64,10 +64,10 @@
 
                     <!-- Левая группа - кнопки -->
                     <StackPanel Grid.Column="0" Orientation="Horizontal">
-                        <Button Content="▶ Запустить" Background="{StaticResource AccentColor}" 
-                                Style="{StaticResource ModernButton}" Click="RunCode_Click"/>
-                        <Button Content="📋 Пример" Background="{StaticResource WarningColor}" 
-                                Style="{StaticResource ModernButton}" Click="LoadExample_Click" Margin="5,0,0,0"/>
+                        <Button x:Name="RunButton" Content="▶ Запустить" Background="{StaticResource AccentColor}" 
+            Style="{StaticResource ModernButton}" Click="RunCode_Click"/>
+                        <Button x:Name="ExampleButton" Content="📋 Пример" Background="{StaticResource WarningColor}" 
+            Style="{StaticResource ModernButton}" Click="LoadExample_Click" Margin="5,0,0,0"/>
                     </StackPanel>
 
                     <!-- Центр - информация о файле -->
@@ -76,17 +76,26 @@
                                Foreground="{StaticResource TextSecondary}" 
                                VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="12"/>
 
-                    <!-- Правая группа - пользователь и кнопки -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                        <!-- Упрощенный бейдж пользователя (только визуал, без функционала) -->
+                        <Button x:Name="ThemeButton" Content="🎨 Тема" Background="{StaticResource PrimaryColor}" 
+        Style="{StaticResource ModernButton}" Click="ThemeButton_Click">
+                            <Button.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="🌙 Dark" Click="ThemeDark_Click"/>
+                                    <MenuItem Header="🎀 PickMe" Click="ThemePickMe_Click"/>
+                                    <MenuItem Header="🧛 Dracula" Click="ThemeDracula_Click"/>
+                                    <MenuItem Header="🏔️ Nord" Click="ThemeNord_Click"/>
+                                </ContextMenu>
+                            </Button.ContextMenu>
+                        </Button>
+
+                        <!-- Упрощенный бейдж пользователя -->
                         <Border Style="{StaticResource UserBadgeStyle}">
                             <StackPanel Orientation="Horizontal">
-                                <!-- Аватар -->
                                 <Border Style="{StaticResource AvatarStyle}">
                                     <TextBlock x:Name="AvatarText" Text="👤" FontSize="16" 
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
-                                <!-- Информация -->
                                 <StackPanel>
                                     <TextBlock x:Name="UserNameText" Text="" FontSize="12" 
                            Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold"/>
@@ -96,18 +105,17 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Кнопки действий -->
                         <Button x:Name="AdminButton" Content="👑 Стать администратором" 
-            Background="{StaticResource WarningColor}" Style="{StaticResource ModernButton}" 
-            Click="BecomeAdmin_Click" Visibility="Collapsed"/>
+        Background="{StaticResource WarningColor}" Style="{StaticResource ModernButton}" 
+        Click="BecomeAdmin_Click" Visibility="Collapsed"/>
                         <Button x:Name="UserManagementButton" Content="👥 Пользователи" 
-            Background="#2196F3" Style="{StaticResource ModernButton}" 
-            Click="UserManagement_Click" Visibility="Collapsed"/>
-                        <Button Content="🔄 Обновить" Background="{StaticResource PrimaryColor}" 
-            Style="{StaticResource ModernButton}" Click="Refresh_Click"/>
-                        <Button Content="🚪 Выйти" Background="{StaticResource ErrorColor}" 
-            Style="{StaticResource ModernButton}" Click="Logout_Click"/>
-                    </StackPanel>
+        Background="#2196F3" Style="{StaticResource ModernButton}" 
+        Click="UserManagement_Click" Visibility="Collapsed"/>
+                        <Button x:Name="RefreshButton" Content="🔄 Обновить" Background="{StaticResource PrimaryColor}" 
+        Style="{StaticResource ModernButton}" Click="Refresh_Click"/>
+                        <Button x:Name="LogoutButton" Content="🚪 Выйти" Background="{StaticResource ErrorColor}" 
+        Style="{StaticResource ModernButton}" Click="Logout_Click"/>
+                    </StackPanel>   
                 </Grid>
             </Border>
 
@@ -119,10 +127,37 @@
                 </Grid.RowDefinitions>
 
                 <TabControl x:Name="FileTabs" Grid.Row="0" TabStripPlacement="Top"
-                            SelectionChanged="FileTab_SelectionChanged"
-                            Background="{StaticResource BackgroundLight}" BorderThickness="0">
+            SelectionChanged="FileTab_SelectionChanged"
+            Background="{StaticResource BackgroundLight}" BorderThickness="0">
                     <TabControl.ItemContainerStyle>
-                        <Style TargetType="TabItem" BasedOn="{StaticResource TabItemStyle}"/>
+                        <Style TargetType="TabItem" BasedOn="{StaticResource TabItemStyle}">
+                            <Setter Property="HeaderTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding}" VerticalAlignment="Center"/>
+                                            <Button Grid.Column="1" Width="20" Height="20" 
+                                    Content="✕" FontSize="10" Margin="8,0,0,0"
+                                    Cursor="Hand" Background="Transparent" 
+                                    BorderThickness="0" Foreground="#858585"
+                                    Click="CloseTab_Click" Tag="{Binding}">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border Background="{TemplateBinding Background}" CornerRadius="2">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
                     </TabControl.ItemContainerStyle>
                 </TabControl>
 
@@ -146,8 +181,7 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock Grid.Column="0" Text="📋 ВЫВОД ПРОГРАММЫ" 
-                                       Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="Bold"/>
+                            <TextBlock x:Name="OutputTitle" Text="📋 ВЫВОД ПРОГРАММЫ" Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="Bold"/>
 
                             <TextBlock Grid.Column="1" x:Name="OutputInfoText" 
                                        Text="" Foreground="{StaticResource TextSecondary}" FontSize="11"

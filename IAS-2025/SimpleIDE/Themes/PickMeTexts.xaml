@@ -1,0 +1,28 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Забавные тексты для кнопок PickMe -->
+    <system:String x:Key="RunButtonText">💖 ЗАПУСТИТЬ 💖</system:String>
+    <system:String x:Key="ExampleButtonText">✨ ПРИМЕР ✨</system:String>
+    <system:String x:Key="AdminButtonText">👸 СТАТЬ ПРИНЦЕССОЙ 👸</system:String>
+    <system:String x:Key="UsersButtonText">💕 МОИ ДРУЗЬЯ 💕</system:String>
+    <system:String x:Key="RefreshButtonText">🔄 ОБНОВИТЬ 🔄</system:String>
+    <system:String x:Key="LogoutButtonText">💔 ПОКА-ПОКА 💔</system:String>
+    <system:String x:Key="CopyButtonText">📋 СКОПИРОВАТЬ 📋</system:String>
+    <system:String x:Key="ClearButtonText">🧹 ОЧИСТИТЬ 🧹</system:String>
+    <system:String x:Key="NewFolderButtonText">🎀 НОВАЯ ПАПОЧКА 🎀</system:String>
+    <system:String x:Key="NewFileButtonText">✨ НОВЫЙ ФАЙЛИК ✨</system:String>
+    <system:String x:Key="WelcomeText">🌸🍭 ДОБРО ПОЖАЛОВАТЬ В PICKME EDITION! 🍭🌸
+
+Привет, сладкоежка! 💕
+
+Это не просто IDE - это твой личный
+розовый мир программирования! 🎀
+
+Пиши код с любовью и улыбкой! 💖✨</system:String>
+    <system:String x:Key="ProjectTitle">🎀 МОИ ПРОЕКТЫ 🎀</system:String>
+    <system:String x:Key="OutputTitle">💕 ВЫВОД ПРОГРАММЫ 💕</system:String>
+    <system:String x:Key="NoFileText">✨ НЕТ ОТКРЫТОГО ФАЙЛИКА ✨</system:String>
+    <system:String x:Key="RightClickHint">🌸 Правой кнопкой для создания! 🌸</system:String>
+</ResourceDictionary>

@@ -90,7 +90,7 @@
         </Setter>
     </Style>
 
-    <!-- Стиль для кнопок -->
+    <!-- Стиль для кнопок с динамическими цветами -->
     <Style x:Key="ModernButton" TargetType="Button">
         <Setter Property="Height" Value="35"/>
         <Setter Property="FontSize" Value="13"/>
@@ -98,19 +98,19 @@
         <Setter Property="Padding" Value="15,0"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextLight}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="4">
+                    <Border x:Name="border" Background="{DynamicResource PrimaryColor}" CornerRadius="4">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Opacity" Value="0.85"/>
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource PrimaryLight}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="border" Property="Opacity" Value="0.7"/>
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource PrimaryDark}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

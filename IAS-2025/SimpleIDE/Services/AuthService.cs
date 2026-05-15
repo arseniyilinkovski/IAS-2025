@@ -6,37 +6,41 @@ namespace SimpleIDE.Services
 {
     public class AuthService
     {
-        private readonly ApplicationDbContext _context;
         private User? _currentUser;
-
-        public AuthService(ApplicationDbContext context)
-        {
-            _context = context;
-        }
 
         public User? CurrentUser => _currentUser;
         public bool IsAdmin => _currentUser?.IsAdmin ?? false;
 
+        private ApplicationDbContext CreateContext()
+        {
+            return new ApplicationDbContext();
+        }
+
         public async Task<bool> RegisterAsync(string username, string password)
         {
-            if (await _context.Users.AnyAsync(u => u.Username == username))
+            using var context = CreateContext();
+
+            if (await context.Users.AnyAsync(u => u.Username == username))
                 return false;
 
             var user = new User
             {
                 Username = username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
-                IsAdmin = false
+                IsAdmin = false,
+                CreatedAt = DateTime.Now
             };
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> LoginAsync(string username, string password)
         {
-            var user = await _context.Users
+            using var context = CreateContext();
+
+            var user = await context.Users
                 .FirstOrDefaultAsync(u => u.Username == username);
 
             if (user == null) return false;
@@ -50,79 +54,52 @@ namespace SimpleIDE.Services
             return false;
         }
 
-        // Принудительное обновление текущего пользователя из БД
         public async Task RefreshCurrentUserAsync()
         {
-            if (_currentUser != null)
+            if (_currentUser == null) return;
+
+            using var context = CreateContext();
+            var freshUser = await context.Users.FindAsync(_currentUser.Id);
+            if (freshUser != null)
             {
-                var freshUser = await _context.Users
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(u => u.Id == _currentUser.Id);
-
-                if (freshUser != null)
-                {
-                    _currentUser = freshUser;
-                    System.Diagnostics.Debug.WriteLine($"User {_currentUser.Username} refreshed. IsAdmin: {_currentUser.IsAdmin}");
-                }
+                _currentUser = freshUser;
             }
-        }
-
-        // Проверка прав администратора напрямую из БД
-        public async Task<bool> IsAdminRealTimeAsync()
-        {
-            if (_currentUser == null) return false;
-
-            var user = await _context.Users
-                .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Id == _currentUser.Id);
-
-            return user?.IsAdmin ?? false;
         }
 
         public async Task<bool> MakeAdminAsync(string password, int userId)
         {
             if (password != "AdminPass123!") return false;
 
-            var user = await _context.Users.FindAsync(userId);
+            using var context = CreateContext();
+            var user = await context.Users.FindAsync(userId);
             if (user == null) return false;
 
             user.IsAdmin = true;
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             if (_currentUser?.Id == userId)
-            {
                 _currentUser.IsAdmin = true;
-            }
 
             return true;
         }
 
         public async Task<List<User>> GetAllUsersAsync()
         {
-            return await _context.Users.ToListAsync();
+            using var context = CreateContext();
+            return await context.Users.ToListAsync();
         }
 
         public async Task<bool> SetAdminRoleAsync(int userId, bool isAdmin)
         {
-            var user = await _context.Users.FindAsync(userId);
+            if (!IsAdmin) return false;
+
+            using var context = CreateContext();
+            var user = await context.Users.FindAsync(userId);
             if (user == null) return false;
 
             user.IsAdmin = isAdmin;
-            await _context.SaveChangesAsync();
-
-            // Если меняем текущего пользователя - обновляем его
-            if (_currentUser?.Id == userId)
-            {
-                _currentUser.IsAdmin = isAdmin;
-            }
-
-            System.Diagnostics.Debug.WriteLine($"User {user.Username} admin status changed to: {isAdmin}");
+            await context.SaveChangesAsync();
             return true;
-        }
-
-        public async Task<User?> GetUserByIdAsync(int userId)
-        {
-            return await _context.Users.FindAsync(userId);
         }
 
         public void Logout()

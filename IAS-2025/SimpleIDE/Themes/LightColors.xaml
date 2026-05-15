@@ -1,0 +1,41 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Основные цвета -->
+    <SolidColorBrush x:Key="PrimaryColor" Color="#6C93B5"/>
+    <!-- Спокойный синий -->
+    <SolidColorBrush x:Key="PrimaryDark" Color="#5A7D9E"/>
+    <SolidColorBrush x:Key="PrimaryLight" Color="#8AADD0"/>
+    <SolidColorBrush x:Key="AccentColor" Color="#7FA879"/>
+    <!-- Спокойный зеленый -->
+    <SolidColorBrush x:Key="WarningColor" Color="#E09D6B"/>
+    <!-- Спокойный оранжевый -->
+    <SolidColorBrush x:Key="ErrorColor" Color="#C86B6B"/>
+    <!-- Спокойный красный -->
+    <SolidColorBrush x:Key="AdminColor" Color="#9B8ABF"/>
+    <!-- Спокойный фиолетовый -->
+
+    <!-- Фоновые цвета -->
+    <SolidColorBrush x:Key="BackgroundDark" Color="#F8F6F0"/>
+    <!-- Сливочный белый -->
+    <SolidColorBrush x:Key="BackgroundMedium" Color="#F1EFE8"/>
+    <!-- Приятный кремовый -->
+    <SolidColorBrush x:Key="BackgroundLight" Color="#E8E5DC"/>
+    <!-- Теплый светлый -->
+    <SolidColorBrush x:Key="BackgroundPanel" Color="#DEDAD0"/>
+    <!-- Нейтральный -->
+
+    <!-- Текстовые цвета -->
+    <SolidColorBrush x:Key="TextPrimary" Color="#2C2C2C"/>
+    <!-- Мягкий черный -->
+    <SolidColorBrush x:Key="TextSecondary" Color="#787878"/>
+    <SolidColorBrush x:Key="TextLight" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="TextDark" Color="#2C2C2C"/>
+
+    <!-- Границы -->
+    <SolidColorBrush x:Key="BorderColor" Color="#D4CFC5"/>
+
+    <!-- Дополнительные цвета -->
+    <SolidColorBrush x:Key="HoverBackground" Color="#E8E5DC"/>
+    <SolidColorBrush x:Key="SelectedBackground" Color="#D6D1C5"/>
+</ResourceDictionary>

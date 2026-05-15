@@ -6,17 +6,22 @@ namespace SimpleIDE.Services
 {
     public class FileSystemService
     {
-        private readonly ApplicationDbContext _context;
         private readonly AuthService _authService;
 
-        public FileSystemService(ApplicationDbContext context, AuthService authService)
+        public FileSystemService(AuthService authService)
         {
-            _context = context;
             _authService = authService;
+        }
+
+        private ApplicationDbContext CreateContext()
+        {
+            return new ApplicationDbContext();
         }
 
         public async Task<Folder> CreateFolderAsync(string name, int? parentFolderId = null)
         {
+            using var context = CreateContext();
+
             if (_authService.CurrentUser == null)
                 throw new UnauthorizedAccessException();
 
@@ -24,16 +29,19 @@ namespace SimpleIDE.Services
             {
                 Name = name,
                 UserId = _authService.CurrentUser.Id,
-                ParentFolderId = parentFolderId
+                ParentFolderId = parentFolderId,
+                CreatedAt = DateTime.Now
             };
 
-            _context.Folders.Add(folder);
-            await _context.SaveChangesAsync();
+            context.Folders.Add(folder);
+            await context.SaveChangesAsync();
             return folder;
         }
 
         public async Task<FileItem> CreateFileAsync(string name, string content, int? folderId = null)
         {
+            using var context = CreateContext();
+
             if (_authService.CurrentUser == null)
                 throw new UnauthorizedAccessException();
 
@@ -42,20 +50,24 @@ namespace SimpleIDE.Services
                 Name = name,
                 Content = content,
                 FolderId = folderId,
-                UserId = _authService.CurrentUser.Id
+                UserId = _authService.CurrentUser.Id,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
             };
 
-            _context.Files.Add(file);
-            await _context.SaveChangesAsync();
+            context.Files.Add(file);
+            await context.SaveChangesAsync();
             return file;
         }
 
         public async Task<List<Folder>> GetRootFoldersAsync()
         {
+            using var context = CreateContext();
+
             if (_authService.CurrentUser == null)
                 return new List<Folder>();
 
-            return await _context.Folders
+            return await context.Folders
                 .Where(f => f.UserId == _authService.CurrentUser.Id && f.ParentFolderId == null)
                 .Include(f => f.SubFolders)
                 .Include(f => f.Files)
@@ -64,36 +76,42 @@ namespace SimpleIDE.Services
 
         public async Task UpdateFileContentAsync(int fileId, string content)
         {
-            var file = await _context.Files.FindAsync(fileId);
+            using var context = CreateContext();
+
+            var file = await context.Files.FindAsync(fileId);
             if (file != null && file.UserId == _authService.CurrentUser?.Id)
             {
                 file.Content = content;
                 file.UpdatedAt = DateTime.Now;
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
         }
 
         public async Task DeleteFileAsync(int fileId)
         {
-            var file = await _context.Files.FindAsync(fileId);
+            using var context = CreateContext();
+
+            var file = await context.Files.FindAsync(fileId);
             if (file != null && file.UserId == _authService.CurrentUser?.Id)
             {
-                _context.Files.Remove(file);
-                await _context.SaveChangesAsync();
+                context.Files.Remove(file);
+                await context.SaveChangesAsync();
             }
         }
 
         public async Task DeleteFolderAsync(int folderId)
         {
-            var folder = await _context.Folders
+            using var context = CreateContext();
+
+            var folder = await context.Folders
                 .Include(f => f.SubFolders)
                 .Include(f => f.Files)
                 .FirstOrDefaultAsync(f => f.Id == folderId);
 
             if (folder != null && folder.UserId == _authService.CurrentUser?.Id)
             {
-                _context.Folders.Remove(folder);
-                await _context.SaveChangesAsync();
+                context.Folders.Remove(folder);
+                await context.SaveChangesAsync();
             }
         }
     }

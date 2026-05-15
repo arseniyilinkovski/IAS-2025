@@ -1,0 +1,41 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Основные цвета - яркая розовая палитра -->
+    <SolidColorBrush x:Key="PrimaryColor" Color="#FF1493"/>
+    <SolidColorBrush x:Key="InfoColor" Color="#FF69B4"/>
+    <!-- Горячий розовый -->
+    <SolidColorBrush x:Key="PrimaryDark" Color="#C71585"/>
+    <SolidColorBrush x:Key="PrimaryLight" Color="#FF69B4"/>
+    <SolidColorBrush x:Key="AccentColor" Color="#FFB6C1"/>
+    <!-- Светло-розовый -->
+    <SolidColorBrush x:Key="WarningColor" Color="#FFA07A"/>
+    <!-- Лососевый -->
+    <SolidColorBrush x:Key="ErrorColor" Color="#FF4444"/>
+    <!-- Яркий красный -->
+    <SolidColorBrush x:Key="AdminColor" Color="#DA70D6"/>
+    <!-- Орхидея -->
+
+    <!-- Фоновые цвета -->
+    <SolidColorBrush x:Key="BackgroundDark" Color="#FFF0F5"/>
+    <!-- Лавандовый румянец -->
+    <SolidColorBrush x:Key="BackgroundMedium" Color="#FFE4E8"/>
+    <!-- Нежно-розовый -->
+    <SolidColorBrush x:Key="BackgroundLight" Color="#FFDDE3"/>
+    <!-- Розовый светлый -->
+    <SolidColorBrush x:Key="BackgroundPanel" Color="#FFB6C1"/>
+    <!-- Розовый -->
+
+    <!-- Текстовые цвета -->
+    <SolidColorBrush x:Key="TextPrimary" Color="#4A0033"/>
+    <!-- Темно-розовый -->
+    <SolidColorBrush x:Key="TextSecondary" Color="#8B6969"/>
+    <!-- Приглушенный розовый -->
+    <SolidColorBrush x:Key="TextLight" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="TextDark" Color="#4A0033"/>
+
+    <!-- Границы -->
+    <SolidColorBrush x:Key="BorderColor" Color="#FF69B4"/>
+    <SolidColorBrush x:Key="HoverBackground" Color="#FFD4E0"/>
+    <SolidColorBrush x:Key="SelectedBackground" Color="#FFE0EB"/>
+</ResourceDictionary>

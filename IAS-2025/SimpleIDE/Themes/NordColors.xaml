@@ -1,0 +1,26 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <SolidColorBrush x:Key="PrimaryColor" Color="#88C0D0"/>
+    <SolidColorBrush x:Key="PrimaryDark" Color="#6A9FB3"/>
+    <SolidColorBrush x:Key="PrimaryLight" Color="#A5DBE8"/>
+    <SolidColorBrush x:Key="AccentColor" Color="#A3BE8C"/>
+    <SolidColorBrush x:Key="WarningColor" Color="#D08770"/>
+    <SolidColorBrush x:Key="ErrorColor" Color="#BF616A"/>
+    <SolidColorBrush x:Key="AdminColor" Color="#B48EAD"/>
+
+    <SolidColorBrush x:Key="BackgroundDark" Color="#2E3440"/>
+    <SolidColorBrush x:Key="BackgroundMedium" Color="#3B4252"/>
+    <SolidColorBrush x:Key="BackgroundLight" Color="#434C5E"/>
+    <SolidColorBrush x:Key="BackgroundPanel" Color="#4C566A"/>
+
+    <SolidColorBrush x:Key="TextPrimary" Color="#E5E9F0"/>
+    <SolidColorBrush x:Key="TextSecondary" Color="#81A1C1"/>
+    <SolidColorBrush x:Key="TextLight" Color="#ECEFF4"/>
+    <SolidColorBrush x:Key="TextDark" Color="#333333"/>
+
+    <SolidColorBrush x:Key="BorderColor" Color="#4C566A"/>
+    <SolidColorBrush x:Key="InfoColor" Color="#88C0D0"/>
+    <SolidColorBrush x:Key="HoverBackground" Color="#3B4252"/>
+    <SolidColorBrush x:Key="SelectedBackground" Color="#434C5E"/>
+</ResourceDictionary>   

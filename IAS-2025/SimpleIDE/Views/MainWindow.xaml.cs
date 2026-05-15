@@ -1,6 +1,10 @@
-﻿using System.Windows;
+﻿using SimpleIDE.Models;
+using SimpleIDE.Services;
+using System.Windows;
 using System.Windows.Controls;
-using SimpleIDE.Models;
+using System.Windows.Input;
+using System.Windows.Media;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace SimpleIDE.Views
 {
@@ -8,12 +12,57 @@ namespace SimpleIDE.Views
     {
         private Dictionary<TabItem, FileItem> _openFiles = new Dictionary<TabItem, FileItem>();
         private FileItem? _currentFile;
+        private System.Threading.Timer _autoSaveTimer;
+        private bool _hasUnsavedChanges = false;
 
         public MainWindow()
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
             UpdateAdminUI();
+            _autoSaveTimer = new System.Threading.Timer(AutoSaveCallback, null, 2000, 2000);
+            this.PreviewKeyDown += MainWindow_PreviewKeyDown;
+        }
+        private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            // Ctrl + S
+            if (e.Key == Key.S && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                SaveCurrentFile();
+                e.Handled = true;
+            }
+        }
+        private async void SaveCurrentFile()
+        {
+            if (_currentFile != null && CodeEditor != null)
+            {
+                _currentFile.Content = CodeEditor.Text;
+                await App.FileSystemService.UpdateFileContentAsync(_currentFile.Id, CodeEditor.Text);
+
+                var content = CodeEditor.Text;
+                var lines = content.Split('\n').Length;
+                var chars = content.Length;
+                FileInfoText.Text = $"📄 {_currentFile.Name} | Строк: {lines} | Символов: {chars} 💾 сохранено";
+
+                // Сбрасываем сообщение через 2 секунды
+                await Task.Delay(2000);
+                if (_currentFile != null)
+                {
+                    FileInfoText.Text = $"📄 {_currentFile.Name} | Строк: {lines} | Символов: {chars}";
+                }
+            }
+        }
+        private void AutoSaveCallback(object state)
+        {
+            if (_hasUnsavedChanges && _currentFile != null)
+            {
+                Dispatcher.Invoke(async () =>
+                {
+                    await App.FileSystemService.UpdateFileContentAsync(_currentFile.Id, CodeEditor.Text);
+                    _hasUnsavedChanges = false;
+                    FileInfoText.Text = FileInfoText.Text.Replace("✨", "💾 сохранено");
+                });
+            }
         }
 
         public void UpdateAdminUI()
@@ -135,6 +184,7 @@ namespace SimpleIDE.Views
 
         private void OpenFile(FileItem file)
         {
+            // Проверяем, не открыт ли уже этот файл
             var existingTab = _openFiles.FirstOrDefault(x => x.Value.Id == file.Id).Key;
             if (existingTab != null)
             {
@@ -142,6 +192,7 @@ namespace SimpleIDE.Views
                 return;
             }
 
+            // Создаем новую вкладку с заголовком
             var tabItem = new TabItem
             {
                 Header = file.Name,
@@ -154,20 +205,16 @@ namespace SimpleIDE.Views
             LoadFileToEditor(file);
         }
 
-        private void LoadFileToEditor(FileItem file)
-        {
-            _currentFile = file;
-            var content = file.Content ?? "";
-            content = content.Replace("\r\n", "\n");
-            CodeEditor.Text = content;
-            var lines = content.Split('\n').Length;
-            var chars = content.Length;
-            FileInfoText.Text = $"📄 {file.Name} | Строк: {lines} | Символов: {chars}";
-            CodeEditor.FocusEditor();
-        }
 
-        private void FileTab_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void FileTab_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            // Сохраняем текущий файл перед переключением
+            if (_currentFile != null && CodeEditor != null)
+            {
+                _currentFile.Content = CodeEditor.Text;
+                await App.FileSystemService.UpdateFileContentAsync(_currentFile.Id, CodeEditor.Text);
+            }
+
             if (FileTabs.SelectedItem is TabItem selectedTab && _openFiles.ContainsKey(selectedTab))
             {
                 var file = _openFiles[selectedTab];
@@ -175,15 +222,17 @@ namespace SimpleIDE.Views
             }
         }
 
-        private async void CodeEditor_TextChanged(object sender, EventArgs e)
+        private void CodeEditor_TextChanged(object sender, EventArgs e)
         {
             if (_currentFile != null && CodeEditor != null)
             {
-                await App.FileSystemService.UpdateFileContentAsync(_currentFile.Id, CodeEditor.Text);
                 var content = CodeEditor.Text;
                 var lines = content.Split('\n').Length;
                 var chars = content.Length;
-                FileInfoText.Text = $"📄 {_currentFile.Name} | Строк: {lines} | Символов: {chars} ✨ сохранено";
+                FileInfoText.Text = $"📄 {_currentFile.Name} | Строк: {lines} | Символов: {chars} ✨ (не сохранено)";
+
+                _currentFile.Content = content;
+                _hasUnsavedChanges = true;
             }
         }
 
@@ -201,6 +250,85 @@ namespace SimpleIDE.Views
             var result = await App.BackendService.CompileAndRunAsync(code);
             OutputBox.Text = result;
         }
+        private async void CloseTab_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            var tabItem = FindParentTabItem(button);
+
+            if (tabItem != null && _openFiles.ContainsKey(tabItem))
+            {
+                var file = _openFiles[tabItem];
+
+                // Проверяем наличие несохраненных изменений
+                if (_hasUnsavedChanges && _currentFile?.Id == file.Id)
+                {
+                    var result = MessageBox.Show($"Сохранить изменения в файле '{file.Name}'?",
+                        "Несохраненные изменения",
+                        MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        await App.FileSystemService.UpdateFileContentAsync(file.Id, CodeEditor.Text);
+                        file.Content = CodeEditor.Text;
+                        _hasUnsavedChanges = false;
+                    }
+                    else if (result == MessageBoxResult.Cancel)
+                    {
+                        return;
+                    }
+                }
+
+                // Закрываем вкладку
+                FileTabs.Items.Remove(tabItem);
+                _openFiles.Remove(tabItem);
+
+                if (_currentFile?.Id == file.Id)
+                {
+                    if (_openFiles.Any())
+                    {
+                        var firstTab = _openFiles.First();
+                        FileTabs.SelectedItem = firstTab.Key;
+                        LoadFileToEditor(firstTab.Value);
+                    }
+                    else
+                    {
+                        _currentFile = null;
+                        CodeEditor.Text = "";
+                        FileInfoText.Text = "Нет открытого файла";
+                        _hasUnsavedChanges = false;
+                    }
+                }
+            }
+        }
+
+        private TabItem FindParentTabItem(DependencyObject child)
+        {
+            while (child != null)
+            {
+                if (child is TabItem tabItem)
+                    return tabItem;
+                child = VisualTreeHelper.GetParent(child);
+            }
+            return null;
+        }
+        private void LoadFileToEditor(FileItem file)
+        {
+            _currentFile = file;
+            var content = file.Content ?? "";
+            content = content.Replace("\r\n", "\n");
+            CodeEditor.Text = content;
+            _hasUnsavedChanges = false;
+            UpdateFileInfo(file);
+            CodeEditor.FocusEditor();
+        }
+        private void UpdateFileInfo(FileItem file)
+        {
+            var content = file.Content ?? "";
+            var lines = content.Split('\n').Length;
+            var chars = content.Length;
+            FileInfoText.Text = $"📄 {file.Name} | Строк: {lines} | Символов: {chars}";
+        }
+
 
         private async void CreateRootFile_Click(object sender, RoutedEventArgs e)
         {
@@ -243,7 +371,16 @@ namespace SimpleIDE.Views
                 await LoadFileTree();
             }
         }
-
+        public async void SaveAllOpenFiles()
+        {
+            foreach (var file in _openFiles.Values)
+            {
+                if (file.Content != null)
+                {
+                    await App.FileSystemService.UpdateFileContentAsync(file.Id, file.Content);
+                }
+            }
+        }
         private async Task DeleteFile(FileItem file)
         {
             var result = MessageBox.Show($"Удалить файл '{file.Name}'?",
@@ -403,7 +540,128 @@ output oct;
             await LoadFileTree();
             await CheckBackendConnection();
         }
+        private void ThemeButton_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            if (button?.ContextMenu != null)
+            {
+                button.ContextMenu.IsOpen = true;
+            }
+        }
+        private void ThemePickMe_Click(object sender, RoutedEventArgs e)
+        {
+            ThemeService.ApplyTheme(AppTheme.PickMe);
+            RefreshAllStyles();
+            UpdateButtonTexts(); // Явно вызываем обновление текстов
+        }
 
+        private void ThemeDark_Click(object sender, RoutedEventArgs e)
+        {
+            ThemeService.ApplyTheme(AppTheme.Dark);
+            RefreshAllStyles();
+            UpdateButtonTexts();
+        }
+
+        private void ThemeDracula_Click(object sender, RoutedEventArgs e)
+        {
+            ThemeService.ApplyTheme(AppTheme.Dracula);
+            RefreshAllStyles();
+            UpdateButtonTexts();
+        }
+
+        private void ThemeNord_Click(object sender, RoutedEventArgs e)
+        {
+            ThemeService.ApplyTheme(AppTheme.Nord);
+            RefreshAllStyles();
+            UpdateButtonTexts();
+        }
+
+        private void UpdateButtonTexts()
+        {
+            if (ThemeService.CurrentTheme == AppTheme.PickMe)
+            {
+                RunButton.Content = ThemeService.GetLocalizedString("RunButtonText", "▶ Запустить");
+                ExampleButton.Content = ThemeService.GetLocalizedString("ExampleButtonText", "📋 Пример");
+                AdminButton.Content = ThemeService.GetLocalizedString("AdminButtonText", "👑 Стать администратором");
+                UserManagementButton.Content = ThemeService.GetLocalizedString("UsersButtonText", "👥 Пользователи");
+                RefreshButton.Content = ThemeService.GetLocalizedString("RefreshButtonText", "🔄 Обновить");
+                LogoutButton.Content = ThemeService.GetLocalizedString("LogoutButtonText", "🚪 Выйти");
+
+                // Обновляем заголовки
+                LeftPanelTitle.Text = ThemeService.GetLocalizedString("ProjectTitle", "Мои проекты");
+                RightClickHint.Text = ThemeService.GetLocalizedString("RightClickHint", "Правой кнопкой мыши для создания");
+                OutputTitle.Text = ThemeService.GetLocalizedString("OutputTitle", "ВЫВОД ПРОГРАММЫ");
+
+                if (_currentFile == null)
+                {
+                    FileInfoText.Text = ThemeService.GetLocalizedString("NoFileText", "Нет открытого файла");
+                }
+            }
+            else
+            {
+                // Восстанавливаем стандартные тексты
+                RunButton.Content = "▶ Запустить";
+                ExampleButton.Content = "📋 Пример";
+                AdminButton.Content = "👑 Стать администратором";
+                UserManagementButton.Content = "👥 Пользователи";
+                RefreshButton.Content = "🔄 Обновить";
+                LogoutButton.Content = "🚪 Выйти";
+
+                LeftPanelTitle.Text = "Мои проекты";
+                RightClickHint.Text = "Правой кнопкой мыши для создания";
+                OutputTitle.Text = "📋 ВЫВОД ПРОГРАММЫ";
+
+                if (_currentFile == null)
+                {
+                    FileInfoText.Text = "Нет открытого файла";
+                }
+            }
+        }
+
+        private void RefreshAllStyles()
+        {
+            // Обновляем фон главного окна
+            Background = (SolidColorBrush)App.Current.Resources["BackgroundDark"];
+
+            // Обновляем дерево файлов
+            FileTreeView.Background = (SolidColorBrush)App.Current.Resources["BackgroundLight"];
+            FileTreeView.Foreground = (SolidColorBrush)App.Current.Resources["TextPrimary"];
+
+            // Обновляем дерево вкладок
+            FileTabs.Background = (SolidColorBrush)App.Current.Resources["BackgroundLight"];
+
+            // Обновляем Output
+            OutputBox.Background = (SolidColorBrush)App.Current.Resources["BackgroundDark"];
+            OutputBox.Foreground = (SolidColorBrush)App.Current.Resources["TextPrimary"];
+
+            // Обновляем тексты кнопок
+            UpdateButtonTexts();
+
+            // Обновляем текст приветствия в OutputBox
+            if (ThemeService.CurrentTheme == AppTheme.PickMe)
+            {
+                OutputBox.Text = ThemeService.GetLocalizedString("WelcomeText", "✨ Добро пожаловать в SimpleIDE! ✨");
+            }
+            else
+            {
+                OutputBox.Text = "✨ Добро пожаловать в SimpleIDE! ✨";
+            }
+        }
+
+
+
+        // Вспомогательный метод для поиска дочерних элементов
+        private IEnumerable<T> FindVisualChildren<T>(DependencyObject parent) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T t)
+                    yield return t;
+                foreach (var childOfChild in FindVisualChildren<T>(child))
+                    yield return childOfChild;
+            }
+        }
         private async void BecomeAdmin_Click(object sender, RoutedEventArgs e)
         {
             var passwordDialog = new InputDialog("Введите пароль администратора", true);
@@ -458,17 +716,11 @@ output oct;
 
         private async void UserManagement_Click(object sender, RoutedEventArgs e)
         {
-            // Проверяем права администратора в реальном времени
-            var isAdmin = await App.AuthService.IsAdminRealTimeAsync();
-
-            if (!isAdmin)
+            // Упрощенная проверка - просто проверяем свойство IsAdmin
+            if (!App.AuthService.IsAdmin)
             {
-                MessageBox.Show("У вас нет прав администратора! Ваши права были отозваны.",
+                MessageBox.Show("У вас нет прав администратора!",
                     "Доступ запрещен", MessageBoxButton.OK, MessageBoxImage.Warning);
-
-                // Обновляем статус в UI
-                await App.AuthService.RefreshCurrentUserAsync();
-                UpdateAdminUI();
                 return;
             }
 
@@ -484,6 +736,8 @@ output oct;
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
+            ThemeService.ApplyTheme(AppTheme.Dark);
+
             App.AuthService.Logout();
             var loginWindow = new LoginWindow();
             loginWindow.Show();

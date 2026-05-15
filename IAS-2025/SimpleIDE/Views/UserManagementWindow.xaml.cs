@@ -13,12 +13,10 @@ namespace SimpleIDE.Views
 
         private async void UserManagementWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            // Проверяем права администратора в реальном времени из БД
-            var isAdmin = await App.AuthService.IsAdminRealTimeAsync();
-
-            if (!isAdmin)
+            // Просто проверяем свойство IsAdmin
+            if (!App.AuthService.IsAdmin)
             {
-                MessageBox.Show("У вас нет прав администратора! Ваши права были отозваны.",
+                MessageBox.Show("У вас нет прав администратора!",
                     "Доступ запрещен", MessageBoxButton.OK, MessageBoxImage.Warning);
                 Close();
                 return;
@@ -36,11 +34,10 @@ namespace SimpleIDE.Views
 
         private async void UsersGrid_CellEditEnding(object sender, System.Windows.Controls.DataGridCellEditEndingEventArgs e)
         {
-            if (e.Column.DisplayIndex == 3) // Колонка Администратор
+            if (e.Column.DisplayIndex == 3)
             {
                 // Проверяем права перед сохранением
-                var isAdmin = await App.AuthService.IsAdminRealTimeAsync();
-                if (!isAdmin)
+                if (!App.AuthService.IsAdmin)
                 {
                     MessageBox.Show("У вас нет прав администратора! Изменения не сохранены.",
                         "Доступ запрещен", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -55,7 +52,6 @@ namespace SimpleIDE.Views
                 if (checkBox != null)
                 {
                     bool newValue = checkBox.IsChecked ?? false;
-
                     var success = await App.AuthService.SetAdminRoleAsync(user.Id, newValue);
 
                     if (success)
