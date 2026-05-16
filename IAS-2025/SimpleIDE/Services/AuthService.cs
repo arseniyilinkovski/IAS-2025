@@ -15,13 +15,47 @@ namespace SimpleIDE.Services
         {
             return new ApplicationDbContext();
         }
-
-        public async Task<bool> RegisterAsync(string username, string password)
+        public static (bool IsValid, string Message) ValidatePassword(string password)
         {
+            if (string.IsNullOrWhiteSpace(password))
+                return (false, "Пароль не может быть пустым");
+
+            if (password.Length < 6)
+                return (false, "Пароль должен содержать минимум 6 символов");
+
+            if (password.Length > 50)
+                return (false, "Пароль не должен превышать 50 символов");
+
+            bool hasDigit = password.Any(char.IsDigit);
+            bool hasUpper = password.Any(char.IsUpper);
+            bool hasLower = password.Any(char.IsLower);
+
+            // Собираем требования
+            var missingRequirements = new List<string>();
+
+            if (!hasDigit) missingRequirements.Add("цифру");
+            if (!hasUpper) missingRequirements.Add("заглавную букву");
+            if (!hasLower) missingRequirements.Add("строчную букву");
+
+            if (missingRequirements.Any())
+            {
+                string message = $"Пароль должен содержать: {string.Join(", ", missingRequirements)}";
+                return (false, message);
+            }
+
+            return (true, "Пароль надежный");
+        }
+
+        public async Task<(bool Success, string Message)> RegisterAsync(string username, string password)
+        {
+            var passwordValidation = ValidatePassword(password);
+            if (!passwordValidation.IsValid)
+                return (false, passwordValidation.Message);
+
             using var context = CreateContext();
 
             if (await context.Users.AnyAsync(u => u.Username == username))
-                return false;
+                return (false, "Пользователь с таким именем уже существует");
 
             var user = new User
             {
@@ -33,7 +67,7 @@ namespace SimpleIDE.Services
 
             context.Users.Add(user);
             await context.SaveChangesAsync();
-            return true;
+            return (true, "Регистрация успешна!");
         }
 
         public async Task<bool> LoginAsync(string username, string password)
